@@ -24,7 +24,7 @@
         android:layout_width="340dp"
         android:layout_height="51dp"
         android:fontFamily="sans-serif-black"
-        android:text="Locate.Connect.Organise"
+        android:text="Locate.Connect.Organize"
         android:textColor="#000000"
         android:textSize="29sp"
         app:layout_constraintBottom_toBottomOf="parent"
