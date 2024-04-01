@@ -12,7 +12,7 @@ import android.widget.TextView;
 
 public class Splash extends AppCompatActivity {
 
-    Animation Spin,top,bottom,blink;
+    Animation Spin,top,bottom;
     ImageView spImg;
     TextView sptext;
     @Override
@@ -25,10 +25,8 @@ public class Splash extends AppCompatActivity {
         bottom=AnimationUtils.loadAnimation(this,R.anim.bottom);
         sptext=findViewById(R.id.splashtext);
         spImg=findViewById(R.id.spimg);
-        blink=AnimationUtils.loadAnimation(this,R.anim.blink);
 
         spImg.setAnimation(top);
-        spImg.setAnimation(blink);
         sptext.setAnimation(bottom);
 
         new Handler().postDelayed(new Runnable() {
@@ -37,7 +35,6 @@ public class Splash extends AppCompatActivity {
 
                 Intent intent=new Intent(Splash.this, MapsActivity.class);
                 startActivity(intent);
-                overridePendingTransition(R.anim.fade_in,R.anim.bottom);
                 finish();
 
             }
