@@ -29,6 +29,7 @@ public class Login extends AppCompatActivity implements AdapterView.OnItemSelect
         userpswd=(TextInputLayout)findViewById(R.id.logpswrd);
 
 
+
         ArrayAdapter<String> adapter=new ArrayAdapter<>(this, android.R.layout.simple_spinner_item,roles);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spin2.setAdapter(adapter);
