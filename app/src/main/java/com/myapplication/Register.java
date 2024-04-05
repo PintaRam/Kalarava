@@ -3,7 +3,10 @@ package com.myapplication;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
 import android.view.View;
@@ -41,47 +44,48 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-        register=findViewById(R.id.regi);
-        signIn=findViewById(R.id.sign_In);
-        Uname=(TextInputLayout)findViewById(R.id.name);
-        Umail=(TextInputLayout)findViewById(R.id.mail);
-        Upassword=(TextInputLayout)findViewById(R.id.pswrd);
-        Uconfirmpswd=(TextInputLayout)findViewById(R.id.cnfrpswrd);
-        Umob=(TextInputLayout)findViewById(R.id.mob);
-        spin1=findViewById(R.id.spinner1);
+        register = findViewById(R.id.regi);
+        signIn = findViewById(R.id.sign_In);
+        Uname = (TextInputLayout) findViewById(R.id.name);
+        Umail = (TextInputLayout) findViewById(R.id.mail);
+        Upassword = (TextInputLayout) findViewById(R.id.pswrd);
+        Uconfirmpswd = (TextInputLayout) findViewById(R.id.cnfrpswrd);
+        Umob = (TextInputLayout) findViewById(R.id.mob);
+        spin1 = findViewById(R.id.spinner1);
 
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, roles);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-
-        spin1.setAdapter(adapter);
-        spin1.setOnItemSelectedListener(this);
-
-        signIn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-           Intent i=new Intent(Register.this,Login.class);
-           startActivity(i);
+        ConnectivityManager connectivityManager = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
+        if (connectivityManager != null) {
+            NetworkInfo activeNetwork = connectivityManager.getActiveNetworkInfo();
+            if (activeNetwork != null && activeNetwork.isConnected()) {
+                // Internet connection is available
+                // You can proceed with your app logic
+            } else {
+                // No internet connection
+                // Display an error message
+                Toast.makeText(this, "No internet connection available", Toast.LENGTH_SHORT).show();
             }
-        });
 
-        register.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                validate_Data();
-            }
-        });
-    }
-    @Override
-    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-        // Implement what happens when an item is selected
-        Role=roles[position];
-        Toast.makeText(this, "Selected "+roles[position], Toast.LENGTH_SHORT).show();
-    }
+            ArrayAdapter<String> adapter = new ArrayAdapter<String>(this, android.R.layout.simple_spinner_item, roles);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
 
-    @Override
-    public void onNothingSelected(AdapterView<?> parent) {
-        // Implement what happens when nothing is selected
+            spin1.setAdapter(adapter);
+            spin1.setOnItemSelectedListener(this);
+
+            signIn.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Intent i = new Intent(Register.this, Login.class);
+                    startActivity(i);
+                }
+            });
+
+            register.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    validate_Data();
+                }
+            });
+        }
     }
 
     private void validate_Data()
@@ -219,13 +223,6 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
                     Toast.makeText(this, "Role Can not be Null !!", Toast.LENGTH_SHORT).show();
                     break;
             }
-
-
-
-
-//            i.putExtra("email",email);
-//            i.putExtra("password",pswd);
-
         }
     }
 
@@ -285,5 +282,15 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
 
             }
         });
+    }
+
+    @Override
+    public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+
+    }
+
+    @Override
+    public void onNothingSelected(AdapterView<?> parent) {
+
     }
 }
