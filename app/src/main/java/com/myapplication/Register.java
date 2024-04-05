@@ -17,8 +17,12 @@ import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 public class Register extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
@@ -31,6 +35,7 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
     FirebaseDatabase fireDb;
     //FirebaseAuth myAuth;
     DatabaseReference Dbrefer;
+    FirebaseAuth myauth;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -148,57 +153,70 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
             {
                 case "Admin":
                     Dbrefer=fireDb.getReference("Admin"); //Creating Database Refernces
-                    Dbrefer.child(name).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    Dbrefer.orderByChild("mail").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            Toast.makeText(Register.this, "Storing Admin Data.....", Toast.LENGTH_SHORT).show();
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(Register.this,"Registration Successfull !!!!",Toast.LENGTH_LONG).show();
-                                    Intent i=new Intent(Register.this,Login.class);
-                                    startActivity(i);
-                                }
-                            },20000 );
-
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                // Email already exists in the database
+                                Toast.makeText(Register.this, "Admin Email already registered. Please use a different email.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                // Email does not exist in the database, proceed with registration
+                              addAdminDetails(name,user);
+                            }
                         }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(Register.this, "Error checking email existence. Please try again.", Toast.LENGTH_SHORT).show();
+                        }
+
                     });
+
                     break;
                 case "Guest":
                     Dbrefer=fireDb.getReference("Guest"); //Creating Database Refernces
-                    Dbrefer.child(name).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    Dbrefer.orderByChild("mail").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            Toast.makeText(Register.this, "Storing Guest Data.....", Toast.LENGTH_SHORT).show();
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(Register.this,"Registration Successfull !!!!",Toast.LENGTH_LONG).show();
-                                    Intent i=new Intent(Register.this,Login.class);
-                                    startActivity(i);
-                                }
-                            },20000 );
-
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                // Email already exists in the database
+                                Toast.makeText(Register.this, "Guest Email already registered. Please use a different email.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                // Email does not exist in the database, proceed with registration
+                                addGuestDetails(name,user);
+                            }
                         }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(Register.this, "Error checking email existence. Please try again.", Toast.LENGTH_SHORT).show();
+                        }
+
                     });
                     break;
                 case "Organiser":
                     Dbrefer=fireDb.getReference("Organiser"); //Creating Database Refernces
-                    Dbrefer.child(name).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                    Dbrefer.orderByChild("mail").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
-                        public void onComplete(@NonNull Task<Void> task) {
-                            Toast.makeText(Register.this, "Storing Organiser Data.....", Toast.LENGTH_SHORT).show();
-                            new Handler().postDelayed(new Runnable() {
-                                @Override
-                                public void run() {
-                                    Toast.makeText(Register.this,"Registration Successfull !!!!",Toast.LENGTH_LONG).show();
-                                    Intent i=new Intent(Register.this,Login.class);
-                                    startActivity(i);
-                                }
-                            },20000 );
-
+                        public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                            if (dataSnapshot.exists()) {
+                                // Email already exists in the database
+                                Toast.makeText(Register.this, "Organiser Email already registered. Please use a different email.", Toast.LENGTH_SHORT).show();
+                            } else {
+                                // Email does not exist in the database, proceed with registration
+                                addOrganiserDetails(name,user);
+                            }
                         }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(Register.this, "Error checking email existence. Please try again.", Toast.LENGTH_SHORT).show();
+                        }
+
                     });
+                    break;
+                default:
+                    Toast.makeText(this, "Role Can not be Null !!", Toast.LENGTH_SHORT).show();
                     break;
             }
 
@@ -209,5 +227,63 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
 //            i.putExtra("password",pswd);
 
         }
+    }
+
+    private void addAdminDetails(String name,Users user)
+    {
+        Dbrefer.child(name).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(Register.this, "Storing Admin Data.....", Toast.LENGTH_SHORT).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(Register.this,"Registration Successfull !!!!",Toast.LENGTH_LONG).show();
+                        Intent i=new Intent(Register.this,Login.class);
+                        startActivity(i);
+                    }
+                },10000 );
+
+            }
+        });
+    }
+
+
+    private  void addGuestDetails(String name,Users user)
+    {
+        Dbrefer.child(name).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(Register.this, "Storing Guest Data.....", Toast.LENGTH_SHORT).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(Register.this,"Registration Successfull !!!!",Toast.LENGTH_LONG).show();
+                        Intent i=new Intent(Register.this,Login.class);
+                        startActivity(i);
+                    }
+                },10000 );
+
+            }
+        });
+    }
+
+    private void addOrganiserDetails(String name,Users user)
+    {
+        Dbrefer.child(name).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                Toast.makeText(Register.this, "Storing Organiser Data.....", Toast.LENGTH_SHORT).show();
+                new Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(Register.this,"Registration Successfull !!!!",Toast.LENGTH_LONG).show();
+                        Intent i=new Intent(Register.this,Login.class);
+                        startActivity(i);
+                    }
+                },10000 );
+
+            }
+        });
     }
 }
