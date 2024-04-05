@@ -38,6 +38,7 @@
         android:hint="Confirm Password"
         app:errorTextColor="@color/red"
         app:hintTextColor="@color/black"
+        app:passwordToggleEnabled="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.482"
@@ -63,6 +64,7 @@
         android:hint="Password"
         app:errorTextColor="@color/red"
         app:hintTextColor="@color/black"
+        app:passwordToggleEnabled="true"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.517"
@@ -155,7 +157,7 @@
         app:layout_constraintVertical_bias="1.0" />
 
     <Spinner
-        android:id="@+id/spinner"
+        android:id="@+id/spinner1"
         android:layout_width="163dp"
         android:layout_height="46dp"
         app:layout_constraintBottom_toBottomOf="parent"
