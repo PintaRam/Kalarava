@@ -1,9 +1,13 @@
 package com.myapplication;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
+import android.location.LocationManager;
 import android.media.audiofx.Virtualizer;
 import android.net.Uri;
 import android.os.Bundle;
@@ -12,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -22,6 +27,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.karumi.dexter.Dexter;
@@ -39,13 +45,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     Location currlocation;
     FusedLocationProviderClient clientLocation;
     private final int ACCESS_FINE_CODE = 1;
-    Location currloc;
+    final int PERMISSION_REQUEST_CODE=1001;
     SupportMapFragment mapFragment;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        checkpermission();
+
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -53,77 +59,72 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         clientLocation = LocationServices.getFusedLocationProviderClient(this);
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
         mapFragment.getMapAsync(MapsActivity.this);
-//        getpreviousLoc();
+
 
     }
 
-    private void checkpermission()
-    {
-        //dexter is a dependency used here for accessing user permission
-        Dexter.withContext(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(new PermissionListener() {
-            @Override
-            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-                ispermitted=true;
-                Toast.makeText(MapsActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
-            }
 
-            @Override
-            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-
-                Intent i=new Intent();
-                i.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                Uri uri= Uri.fromParts("package",getPackageName(),"");
-                i.setData(uri);
-                startActivity(i);
-            }
-
-            @Override
-            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-                    permissionToken.continuePermissionRequest();
-            }
-        });
-    }
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        LatLng location = new LatLng(13.1169, 77.6346);
-        mMap.addMarker(new MarkerOptions().position(location).title("My Location"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(location, 12));
+        getlocation();
     }
 
-//    public void getpreviousLoc() {
-//        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-//           ActivityCompat.requestPermissions(this,new String[]{Manifest.permission.ACCESS_FINE_LOCATION},ACCESS_FINE_CODE);
-//            return;
-//        }
-//        Task<Location> task = clientLocation.getLastLocation();
-//        task.addOnSuccessListener(new OnSuccessListener<Location>() {
-//            @Override
-//            public void onSuccess(Location location) {
-//                if(location!=null)
-//                {
-//                    currloc=location;
-//                    mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
-//                    mapFragment.getMapAsync(MapsActivity.this);
-//                }
-//            }
-//        });
-//    }
-//
-//    @Override
-//    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-//        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-//        if(requestCode==ACCESS_FINE_CODE)
-//        {
-//            if(grantResults.length>0 && grantResults[0]== PackageManager.PERMISSION_GRANTED)
-//            {
-//                getpreviousLoc();
-//                Toast.makeText(this, "Location Access Sucessfull !!", Toast.LENGTH_SHORT).show();
-//            }
-//            else {
-//                Toast.makeText(this, "Location Access Denied !!", Toast.LENGTH_SHORT).show();
-//            }
-//        }
-//    }
+    private void getlocation()
+    {
+        //Request for location access
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+        }
+
+        // Inside onCreate() method, after checking location settings
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        //fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+
+            @Override
+            public void onSuccess (Location location){
+                if (location != null) {
+                    // Use the location object to get latitude and longitude
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
+                    LatLng userLocation = new LatLng(latitude, longitude);
+                    // Move the camera to the user's location
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 12));
+                    // Add a marker at the user's location
+                    mMap.addMarker(new MarkerOptions().position(userLocation).title("My Location"));
+                } else {
+                    // Unable to retrieve location, show a message or handle it as needed
+                    Toast.makeText(MapsActivity.this, "Unable to retrieve location", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }).addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Location retrieval failed
+                Toast.makeText(MapsActivity.this, "Location retrieval failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+    }
+    private void showLocationTurnDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Location services are disabled. Do you want to enable them?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Open location settings
+                        Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(enableLocationIntent);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Dismiss the dialog
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
 }
