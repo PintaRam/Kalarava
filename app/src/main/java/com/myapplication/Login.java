@@ -2,16 +2,28 @@ package com.myapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.Toast;
+import android.Manifest;
 
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -21,6 +33,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class Login extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
+    private static final int PERMISSION_REQUEST_CODE = 1001;
     Button login;
     final String [] roles={"null","Admin","Guest","Organiser"};
     TextInputLayout userId,userpswd;
@@ -44,6 +57,7 @@ public class Login extends AppCompatActivity implements AdapterView.OnItemSelect
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spin2.setAdapter(adapter);
         spin2.setOnItemSelectedListener(this);
+
 
         login.setOnClickListener(new View.OnClickListener() {
 
@@ -181,6 +195,7 @@ public class Login extends AppCompatActivity implements AdapterView.OnItemSelect
             }
         });
     }
+
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
