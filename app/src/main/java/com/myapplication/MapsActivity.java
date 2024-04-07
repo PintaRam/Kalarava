@@ -54,6 +54,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     final int PERMISSION_REQUEST_CODE=1001;
     SupportMapFragment mapFragment;
     SearchView mysearch;
+    //Search is crashing the app
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
