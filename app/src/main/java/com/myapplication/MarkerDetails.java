@@ -1,28 +1,30 @@
 package com.myapplication;
 
-import com.google.android.gms.maps.model.LatLng;
-
 public class MarkerDetails {
     private String ename;
     private double latitude;
     private double longitude;
     private String eventType;
-    private String time;
-    private String date;
-    private String description;
+    private String startTime;
+    private String endTime;
+    private String startDate;
+
+    private String endDate;
+
 
     public MarkerDetails() {
         // Default constructor required for Firebase
     }
 
-    public MarkerDetails(String name,double latitude, double longitude, String eventType, String time, String date, String description) {
+    public MarkerDetails(double latitude, double longitude, String eventType,String name, String startTime, String startDate,String endDate,String endTime) {
         this.ename=name;
         this.latitude = latitude;
         this.longitude = longitude;
         this.eventType = eventType;
-        this.time = time;
-        this.date = date;
-        this.description = description;
+        this.startTime =startTime;
+        this.endTime = endTime;
+        this.startDate = endDate;
+        this.endDate =endDate;
     }
 
     public  String getevent()
@@ -58,27 +60,37 @@ public class MarkerDetails {
         this.eventType = eventType;
     }
 
-    public String getTime() {
-        return time;
+    public String getTime1() {
+        return startTime;
     }
 
-    public void setTime(String time) {
-        this.time = time;
+    public void setTime1(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getDate1() {
+        return startDate;
+    }
+
+    public void setDate1(String startDate) {
+        this.startDate = startDate;
+    }
+
+    public String getTime() {
+        return endTime;
+    }
+
+    public void setTime(String endTime) {
+        this.endTime =endTime;
     }
 
     public String getDate() {
-        return date;
+        return endDate;
     }
 
-    public void setDate(String date) {
-        this.date = date;
+    public void setDate(String endDate) {
+        this.endDate = endDate;
     }
 
-    public String getDescription() {
-        return description;
-    }
 
-    public void setDescription(String description) {
-        this.description = description;
-    }
 }

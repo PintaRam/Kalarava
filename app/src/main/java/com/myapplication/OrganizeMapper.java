@@ -4,11 +4,12 @@ package com.myapplication;
 import androidx.annotation.NonNull;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.app.AlertDialog;
-import android.app.DatePickerDialog;
+import android.app.Dialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -21,13 +22,15 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
-import android.util.EventLog;
-import android.view.LayoutInflater;
+import android.text.TextUtils;
 import android.view.View;
-import android.widget.ArrayAdapter;
-import android.widget.DatePicker;
+import android.view.ViewGroup;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
+import android.widget.Button;
 import android.widget.EditText;
-import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -43,12 +46,12 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
 import com.myapplication.databinding.ActivityOrganizeMapperBinding;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
-import java.util.Locale;
+import java.util.Date;
 
 public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnMapClickListener {
 
@@ -56,12 +59,16 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
     final int PERMISSION_REQUEST_CODE=1001;
     final int REQUEST_CODE=101;
     private ActivityOrganizeMapperBinding binding;
-    private EditText editTextTime,editTextDate;
-    private String eventname;
-
+    EditText editText,editText1,editText3 , editText4;
+    TextView textView;
+    private Calendar calendar;
+    EditText dateEditText;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+
+
 
         //Request for location access
 
@@ -92,27 +99,38 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
         //LatLng sydney = new LatLng(13.1169, 77.6346);
 
     }
+    public static boolean isGPSEnabled(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        return locationManager != null && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
 
     // Method to show dialog to turn on location services
     private void showLocationTurnDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Location services are disabled. Do you want to enable them?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // Open location settings
-                        Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivity(enableLocationIntent);
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // Dismiss the dialog
-                        dialog.cancel();
-                    }
-                });
-        AlertDialog alert = builder.create();
-        alert.show();
+        if (!OrganizeMapper.isGPSEnabled(this)) {
+
+
+            AlertDialog.Builder builder = new AlertDialog.Builder(this);
+            builder.setMessage("Location services are disabled. Do you want to enable them?")
+                    .setCancelable(false)
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // Open location settings
+                            Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                            startActivity(enableLocationIntent);
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        public void onClick(DialogInterface dialog, int id) {
+                            // Dismiss the dialog
+                            dialog.cancel();
+                        }
+                    });
+            AlertDialog alert = builder.create();
+            alert.show();
+
+
+
+        }
     }
 
     private void get_Location()
@@ -141,7 +159,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
                     LatLng myloc=new LatLng(latitude,longitude);
-                    mMap.addMarker(new MarkerOptions().position(myloc).title("My Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.home)));
+                    mMap.addMarker(new MarkerOptions().position(myloc).title("My Location").icon(bitdescriber(getApplicationContext(),R.drawable.home)));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myloc,20));
 
                     // Do something with the obtained latitude and longitude
@@ -163,56 +181,200 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
     @Override
     public void onMapClick(LatLng latLng) {
-      showMarkerDetailsDialog(latLng);
+        // Custom marker icon
+        //BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.marriage);
+
+        // Add a marker at the clicked location and customize it
+//        mMap.addMarker(new MarkerOptions()
+//                .position(latLng)
+//                .icon(icon)
+//                .title("Custom Marker"));
+        // You can also customize other properties of the marker, such as title, snippet, etc.
+        // mMap.addMarker(new MarkerOptions().position(latLng).icon(icon).title("Custom Marker").snippet("This is a custom marker"));
+
+        // Optionally, you can move the camera to the clicked location
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Select Marker Type")
+                .setItems(new CharSequence[]{"Hospitals","Marriage", "Hackathons", "Institutes","Parking","Banks","Police"}, new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        // Handle marker type selection
+                        switch (which) {
+                            case 0:
+                                // Type 1 marker
+                                addCustomMarker("Hospital" ,latLng, R.drawable.hospital);
+                                break;
+                            case 1:
+                                // Type 2 marker
+                                addCustomMarker("Marriage",latLng, R.drawable.marriage);
+                                break;
+                            case 2:
+                                // Type 3 marker
+                                addCustomMarker("HackThon",latLng, R.drawable.hack);
+                                break;
+                            case 3:
+                                addCustomMarker("Education",latLng, R.drawable.edu);
+                                break;
+                            case 4:
+                                addCustomMarker("Parking",latLng, R.drawable.parking);
+                                break;
+                            case 5:
+                                addCustomMarker("Bank",latLng, R.drawable.bank);
+                                break;
+                            case 6:
+                                addCustomMarker("Police",latLng, R.drawable.police);
+                                break;
+                        }
+                    }
+                });
+        builder.show();
     }
-        //For storing marker Info in
-        private void showMarkerDetailsDialog ( final LatLng latLng){
-            AlertDialog.Builder builder = new AlertDialog.Builder(OrganizeMapper.this);
-            LayoutInflater inflater = this.getLayoutInflater();
-            View dialogView = inflater.inflate(R.layout.activity_marker_details_dialog, null);
-            builder.setView(dialogView);
 
-             editTextTime = dialogView.findViewById(R.id.editTextTime);
-             editTextDate = dialogView.findViewById(R.id.editTextDate);
-            final EditText editTextDescription = dialogView.findViewById(R.id.editTextDescription);
-            final Spinner spinnerEventType = dialogView.findViewById(R.id.spinnerEventType);
-            final EditText eventId =dialogView.findViewById(R.id.eventName);
+//For setting Custmised icons from drawable
+    private void addCustomMarker(String str ,LatLng latLng, int markerDrawableId) {
 
 
 
-            // Populate the spinner with event types
-            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
-                    R.array.event_types_array, android.R.layout.simple_spinner_item);
-            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-            spinnerEventType.setAdapter(adapter);
+        Dialog dialog = new Dialog(this);
+        dialog.setContentView(R.layout.cust_dialog);
+        View view = getLayoutInflater().inflate(R.layout.cust_dialog, (ViewGroup) findViewById(R.id.rel));
+        dialog.setContentView(view);
+        dialog.setCancelable(false);// should not close after clicking outside the dialog box
+        Button btn = dialog.findViewById(R.id.button);
+        Button can =dialog.findViewById(R.id.button1);
+        //event name
+        editText = dialog.findViewById(R.id.editTextText);
+        //starttime
+        editText1  = dialog.findViewById(R.id.editTextText4);
+        //event type
+        textView = dialog.findViewById(R.id.textView2);
+        //StartDate
+        dateEditText = dialog.findViewById(R.id.editTextText2);
+        //EndDate
+        editText3 = dialog.findViewById(R.id.editTextText8);
+        //EndTime
+        editText4 = dialog.findViewById(R.id.editTextText9);
+        textView.setText(str);
 
-            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                     eventname=eventId.getText().toString();
-                    String time = editTextTime.getText().toString();
-                    String date = editTextDate.getText().toString();
-                    String description = editTextDescription.getText().toString();
-                    String eventType = spinnerEventType.getSelectedItem().toString();
+
+
+
+
+
+
+
+        dateEditText.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(dateEditText);
+            }
+        });
+        editText3.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showDatePickerDialog(editText3);
+            }
+        });
+
+        editText4.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimePickerDialog(editText4);
+            }
+        });
+
+        editText1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                showTimePickerDialog(editText1);
+            }
+        });
+
+
+
+        btn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                String startTime = editText1.getText().toString();
+                String endTime = editText4.getText().toString();
+
+                String startDate = dateEditText.getText().toString();
+                String endDate = editText3.getText().toString();
+
+
+                String eventType = textView.getText().toString();
+                String eventName = editText.getText().toString();
+
+
+                if(TextUtils.isEmpty(eventName))
+                {
+                    editText.setError("Please Enter the Name ");
+                } else if (TextUtils.isEmpty(startTime)) {
+                    editText1.setError("Please select the start time");
+                }else if (TextUtils.isEmpty(endTime)) {
+                    editText1.setError("Please select the End time");
+                }
+                else if (TextUtils.isEmpty(startDate)) {
+                    dateEditText.setError("Please Select the Start date");
+                }
+                else if (TextUtils.isEmpty(endDate)) {
+                    dateEditText.setError("Please Select the End date");
+                } else if (isStartDateAfterEndDate(startDate,endDate) == true) {
+                    dateEditText.setError("Enter correct date");
+                    editText3.setError("Enter correct date");
+                    Toast.makeText(OrganizeMapper.this, "Please Enter the Correct Information", Toast.LENGTH_SHORT).show();
+                } else {
+
+
 
                     // Add marker with the provided details
-                    addCustomMarker(latLng, eventType, time, date, description);
-                }
-            });
+                    addCustomMarker(markerDrawableId,latLng,eventType,eventName,startDate,startTime,endDate,endTime);
 
-            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-                @Override
-                public void onClick(DialogInterface dialogInterface, int i) {
-                    dialogInterface.cancel();
-                }
-            });
 
-            builder.show();
+                    dialog.dismiss();
+                }
+
+            }
+        });
+
+        can.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
+        dialog.show();
+
+
+    }
+
+
+    public static boolean isStartDateAfterEndDate(String startDate, String endDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            Date StartDate = sdf.parse(startDate);
+            Date EndDate = sdf.parse(endDate);
+
+            // Compare start date with end date
+            if (StartDate.compareTo(EndDate) > 0) {
+                // Start date is greater than end date
+                return true;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            // Handle parse exception
         }
 
-    private void addCustomMarker(LatLng latLng, String eventType, String time, String date, String description) {
+        // Start date is not greater than end date
+        return false;
+    }
+
+
+    private void addCustomMarker(int markerDrawableId,LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime) {
+
         // Get the corresponding marker icon based on event type
-        int markerDrawableId = getMarkerDrawableId(eventType);
+
         BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(markerDrawableId);
 
         // Add a marker at the clicked location and customize it
@@ -220,86 +382,72 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
                 .position(latLng)
                 .icon(icon)
                 .title("Custom Marker")
-                .snippet("Type: " + eventType + ", Time: " + time + ", Date: " + date + ", Description: " + description);
+                .snippet("Type: " + eventType +", Event Name : "+eventName+ ", Time: " + startTime + ", Date: " + startDate );
         mMap.addMarker(markerOptions);
 
         // Optionally, you can move the camera to the clicked location
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
 
         // Optionally, store marker details in Firebase Realtime Database
-        storeMarkerDetailsInFirebase(latLng, eventType, time, date, description);
+        storeMarkerDetailsInFirebase(latLng,eventType,eventName,startDate,startTime,endDate,endTime);
     }
 
-    private int getMarkerDrawableId(String eventType) {
-        // Implement logic to map event type to corresponding marker drawable resource
-        // For example:
-        switch (eventType) {
-            case "Hospitals":
-                return R.drawable.hospital;
-            case "Marriage":
-                return R.drawable.marriage;
-            case "Hackathon":
-                return R.drawable.hack;
-            case "Bank":
-                return  R.drawable.bank;
-            case "Educational":
-                return R.drawable.edu;
-            case "Police":
-                return R.drawable.police;
-            case "Parking":
-                return R.drawable.parking;
-            default:
-                return R.drawable.home;
-        }
-    }
 
-    private void storeMarkerDetailsInFirebase(LatLng latLng, String eventType, String time, String date, String description) {
+
+    private void storeMarkerDetailsInFirebase(LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime) {
         // Store marker details in Firebase Realtime Database
         DatabaseReference markersRef = FirebaseDatabase.getInstance().getReference("Google markers");
         String markerId = markersRef.push().getKey();
 
         if (markerId != null) {
-            MarkerDetails markerDetails = new MarkerDetails(eventname,latLng.latitude, latLng.longitude, eventType, time, date, description);
-            markersRef.child(eventname).setValue(markerDetails);
+            MarkerDetails markerDetails = new MarkerDetails(latLng.latitude,latLng.longitude,eventType,eventName,startDate,startTime,endDate,endTime);
+            markersRef.child(eventName).setValue(markerDetails);
         }
     }
 
-    //inflatted activities methods
-    public void showDatePickerDialog(View v) {
-        Calendar calendar = Calendar.getInstance();
-        int year = calendar.get(Calendar.YEAR);
-        int month = calendar.get(Calendar.MONTH);
-        int day = calendar.get(Calendar.DAY_OF_MONTH);
-        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
-            @Override
-            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
-                // Display the selected date in the EditText
 
-                editTextDate.setText(String.format(Locale.getDefault(), "%02d/%02d/%04d", dayOfMonth, monthOfYear + 1, year));
-            }
-        }, year, month, day);
-        datePickerDialog.show();
-    }
 
-    public void openTimePicker(View view) {
+
+
+
+    private void showTimePickerDialog(EditText editText) {
         // Get current time
-        Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
+        final Calendar c = Calendar.getInstance();
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int minute = c.get(Calendar.MINUTE);
 
-        // Create a TimePickerDialog and set the listener to handle the selected time
+        // Create a new TimePickerDialog
         TimePickerDialog timePickerDialog = new TimePickerDialog(this,
                 new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        // Display the selected time in the EditText
-                        editTextTime.setText(String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute));
+                        // Update EditText with selected time
+                        editText.setText(String.format("%02d:%02d", hourOfDay, minute));
                     }
-                }, hour, minute, true); // true for 24 hour time
+                }, hour, minute, false);
 
-        // Show the TimePickerDialog when EditText is clicked
+        // Show the dialog
         timePickerDialog.show();
     }
 
 
+    private void showDatePickerDialog(EditText dateEditText) {
+
+        DialogFragment newFragment = new DatePickerFragment(dateEditText);
+        newFragment.show(getSupportFragmentManager(), "datePicker");
+    }
+
+
+
+
+    private BitmapDescriptor bitdescriber(Context ctx,int vectorread)
+    {
+        Drawable vectordraw=ContextCompat.getDrawable(ctx,vectorread);
+        vectordraw.setBounds(0,0,vectordraw.getIntrinsicWidth(),vectordraw.getIntrinsicHeight());
+        Bitmap bitmap=Bitmap.createBitmap(vectordraw.getIntrinsicWidth(),vectordraw.getIntrinsicHeight(),Bitmap.Config.ARGB_8888);
+        Canvas canvas=new Canvas(bitmap);
+        vectordraw.draw(canvas);
+
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
+    }
 }

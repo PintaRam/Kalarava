@@ -8,8 +8,8 @@
 
     <ImageView
         android:id="@+id/imageView2"
-        android:layout_width="387dp"
-        android:layout_height="283dp"
+        android:layout_width="403dp"
+        android:layout_height="137dp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.058"
@@ -68,13 +68,13 @@
 
     <TextView
         android:id="@+id/textView4"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_width="136dp"
+        android:layout_height="46dp"
         android:layout_marginTop="28dp"
         android:text="Sign In"
-        android:textSize="26sp"
         android:textAlignment="center"
         android:textColor="#020202"
+        android:textSize="26sp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.471"
         app:layout_constraintStart_toStartOf="parent"
@@ -94,10 +94,11 @@
 
     <TextView
         android:id="@+id/textView2"
-        android:layout_width="116dp"
-        android:layout_height="35dp"
+        android:layout_width="160dp"
+        android:layout_height="51dp"
+        android:layout_marginStart="24dp"
         android:layout_marginEnd="52dp"
-        android:layout_marginBottom="432dp"
+        android:layout_marginBottom="412dp"
         android:fontFamily="sans-serif"
         android:text="Select Role : "
         android:textColor="@color/black"
@@ -117,9 +118,8 @@
         app:backgroundTint="#0C44EC"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/logpswrd"
-        app:layout_constraintVertical_bias="0.346" />
+        app:layout_constraintVertical_bias="0.518" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
