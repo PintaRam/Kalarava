@@ -154,7 +154,6 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 //                .position(latLng)
 //                .icon(icon)
 //                .title("Custom Marker"));
-
         // You can also customize other properties of the marker, such as title, snippet, etc.
         // mMap.addMarker(new MarkerOptions().position(latLng).icon(icon).title("Custom Marker").snippet("This is a custom marker"));
 
