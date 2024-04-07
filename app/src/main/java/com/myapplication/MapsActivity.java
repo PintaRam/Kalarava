@@ -78,6 +78,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
         }
 
+        showLocationTurnDialog();
         // Inside onCreate() method, after checking location settings
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
         //fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
