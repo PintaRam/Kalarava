@@ -124,7 +124,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
                     LatLng myloc=new LatLng(latitude,longitude);
-                    mMap.addMarker(new MarkerOptions().position(myloc).title("My Location").icon(bitdescriber(getApplicationContext(),R.drawable.bank)));
+                    mMap.addMarker(new MarkerOptions().position(myloc).title("My Location").icon(bitdescriber(getApplicationContext(),R.drawable.home)));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myloc,20));
 
                     // Do something with the obtained latitude and longitude
