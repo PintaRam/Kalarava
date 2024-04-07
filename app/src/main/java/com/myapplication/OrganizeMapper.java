@@ -165,77 +165,6 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
     public void onMapClick(LatLng latLng) {
       showMarkerDetailsDialog(latLng);
     }
-
-        // Custom marker icon
-        //BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.marriage);
-
-        // Add a marker at the clicked location and customize it
-//        mMap.addMarker(new MarkerOptions()
-//                .position(latLng)
-//                .icon(icon)
-//                .title("Custom Marker"));
-        // You can also customize other properties of the marker, such as title, snippet, etc.
-        // mMap.addMarker(new MarkerOptions().position(latLng).icon(icon).title("Custom Marker").snippet("This is a custom marker"));
-
-        // Optionally, you can move the camera to the clicked location
-
-
-        /*
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setTitle("Select Marker Type")
-                .setItems(new CharSequence[]{"Hospitals","Marriage", "Hackathons", "Institutes","Parking","Banks","Police"}, new DialogInterface.OnClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which) {
-                        // Handle marker type selection
-                        switch (which) {
-                            case 0:
-                                // Type 1 marker
-                                addCustomMarker(latLng, R.drawable.hospital);
-                                break;
-                            case 1:
-                                // Type 2 marker
-                                addCustomMarker(latLng, R.drawable.marriage);
-                                break;
-                            case 2:
-                                // Type 3 marker
-                                addCustomMarker(latLng, R.drawable.hack);
-                                break;
-                            case 3:
-                                addCustomMarker(latLng, R.drawable.edu);
-                                break;
-                            case 4:
-                                addCustomMarker(latLng, R.drawable.parking);
-                                break;
-                            case 5:
-                                addCustomMarker(latLng, R.drawable.bank);
-                                break;
-                            case 6:
-                                addCustomMarker(latLng, R.drawable.police);
-                                break;
-                        }
-                    }
-                });
-        builder.show();
-    }
-
-//For setting Customised icons from drawable
-    private void addCustomMarker(LatLng latLng, int markerDrawableId) {
-        // Custom marker icon
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(markerDrawableId);
-
-        // Add a marker at the clicked location and customize it
-        mMap.addMarker(new MarkerOptions()
-                .position(latLng)
-                .icon(icon)
-                .title("Custom Marker"));
-
-        // Optionally, you can move the camera to the clicked location
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-    }
-
-*/
-
-
         //For storing marker Info in
         private void showMarkerDetailsDialog ( final LatLng latLng){
             AlertDialog.Builder builder = new AlertDialog.Builder(OrganizeMapper.this);
@@ -330,7 +259,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
         String markerId = markersRef.push().getKey();
 
         if (markerId != null) {
-            MarkerDetails markerDetails = new MarkerDetails(latLng.latitude, latLng.longitude, eventType, time, date, description);
+            MarkerDetails markerDetails = new MarkerDetails(eventname,latLng.latitude, latLng.longitude, eventType, time, date, description);
             markersRef.child(eventname).setValue(markerDetails);
         }
     }

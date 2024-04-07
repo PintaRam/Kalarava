@@ -3,6 +3,7 @@ package com.myapplication;
 import com.google.android.gms.maps.model.LatLng;
 
 public class MarkerDetails {
+    private String ename;
     private double latitude;
     private double longitude;
     private String eventType;
@@ -14,7 +15,8 @@ public class MarkerDetails {
         // Default constructor required for Firebase
     }
 
-    public MarkerDetails(double latitude, double longitude, String eventType, String time, String date, String description) {
+    public MarkerDetails(String name,double latitude, double longitude, String eventType, String time, String date, String description) {
+        this.ename=name;
         this.latitude = latitude;
         this.longitude = longitude;
         this.eventType = eventType;
@@ -23,6 +25,15 @@ public class MarkerDetails {
         this.description = description;
     }
 
+    public  String getevent()
+    {
+        return this.ename;
+    }
+
+    public void  setEventname(String name)
+    {
+        this.ename=name;
+    }
     public double getLatitude() {
         return latitude;
     }
