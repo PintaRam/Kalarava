@@ -31,18 +31,41 @@ public class AdminsView extends AppCompatActivity {
         setContentView(R.layout.activity_admins_view);
         //Request for location access
 
+        get_my_loc();
+
+
+    }
+    // Method to show dialog to turn on location services
+    private void showLocationTurnDialog() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setMessage("Location services are disabled. Do you want to enable them?")
+                .setCancelable(false)
+                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Open location settings
+                        Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+                        startActivity(enableLocationIntent);
+                    }
+                })
+                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                    public void onClick(DialogInterface dialog, int id) {
+                        // Dismiss the dialog
+                        dialog.cancel();
+                    }
+                });
+        AlertDialog alert = builder.create();
+        alert.show();
+    }
+
+
+    private void get_my_loc()
+    {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
         }
 
-        // after requesting permissions   check whether GPS is Enabled or not
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            // Location services are not enabled, prompt user to enable it
-            showLocationTurnDialog();
-            Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(enableLocationIntent);
-        }
+
+        showLocationTurnDialog();
 
         // Inside onCreate() method, after checking location settings
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -67,26 +90,5 @@ public class AdminsView extends AppCompatActivity {
                 Toast.makeText(AdminsView.this, "Location retrieval failed", Toast.LENGTH_SHORT).show();
             }
         });
-    }
-    // Method to show dialog to turn on location services
-    private void showLocationTurnDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        builder.setMessage("Location services are disabled. Do you want to enable them?")
-                .setCancelable(false)
-                .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // Open location settings
-                        Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-                        startActivity(enableLocationIntent);
-                    }
-                })
-                .setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // Dismiss the dialog
-                        dialog.cancel();
-                    }
-                });
-        AlertDialog alert = builder.create();
-        alert.show();
     }
 }

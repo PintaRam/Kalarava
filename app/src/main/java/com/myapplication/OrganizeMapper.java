@@ -12,6 +12,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -24,6 +27,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -33,8 +38,8 @@ import com.myapplication.databinding.ActivityOrganizeMapperBinding;
 public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallback {
 
     private GoogleMap mMap;
-    double latitude,longitude;
     final int PERMISSION_REQUEST_CODE=1001;
+    final int REQUEST_CODE=101;
     private ActivityOrganizeMapperBinding binding;
 
     @Override
@@ -43,42 +48,6 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
         //Request for location access
 
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
-        }
-
-        // after requesting permissions   check whether GPS is Enabled or not
-        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-            // Location services are not enabled, prompt user to enable it
-            showLocationTurnDialog();
-            Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
-            startActivity(enableLocationIntent);
-        }
-
-        // Inside onCreate() method, after checking location settings
-        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-            @Override
-            public void onSuccess(Location location) {
-                if (location != null) {
-                    // Use the location object to get latitude and longitude
-                     latitude = location.getLatitude();
-                     longitude = location.getLongitude();
-                    // Do something with the obtained latitude and longitude
-                    Toast.makeText(OrganizeMapper.this, "Latitude: " + latitude + ", Longitude: " + longitude, Toast.LENGTH_SHORT).show();
-                } else {
-                    // Unable to retrieve location
-                    Toast.makeText(OrganizeMapper.this, "Unable to retrieve location", Toast.LENGTH_SHORT).show();
-                }
-            }
-        }).addOnFailureListener(this, new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                // Location retrieval failed
-                Toast.makeText(OrganizeMapper.this, "Location retrieval failed", Toast.LENGTH_SHORT).show();
-            }
-        });
 
         binding = ActivityOrganizeMapperBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -86,7 +55,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map2);
-        mapFragment.getMapAsync(this);
+        mapFragment.getMapAsync(OrganizeMapper.this);
     }
 
     /**
@@ -101,12 +70,9 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-
-        // Add a marker in Sydney and move the camera
+        get_Location();
         //LatLng sydney = new LatLng(13.1169, 77.6346);
-        LatLng myloc=new LatLng(latitude,longitude);
-        mMap.addMarker(new MarkerOptions().position(myloc).title("Marker in Sydney"));
-        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myloc,20));
+
     }
 
     // Method to show dialog to turn on location services
@@ -129,5 +95,64 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
                 });
         AlertDialog alert = builder.create();
         alert.show();
+    }
+
+    private void get_Location()
+    {
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+        }
+
+//        // after requesting permissions   check whether GPS is Enabled or not
+//        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+//        if (!locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
+//            // Location services are not enabled, prompt user to enable it
+//
+//            Intent enableLocationIntent = new Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS);
+//            startActivity(enableLocationIntent);
+//        }
+
+        showLocationTurnDialog();
+        // Inside onCreate() method, after checking location settings
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    // Use the location object to get latitude and longitude
+                    double latitude = location.getLatitude();
+                    double longitude = location.getLongitude();
+                    LatLng myloc=new LatLng(latitude,longitude);
+                    mMap.addMarker(new MarkerOptions().position(myloc).title("My Location").icon(bitdescriber(getApplicationContext(),R.drawable.home)));
+                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myloc,20));
+
+                    // Do something with the obtained latitude and longitude
+                    Toast.makeText(OrganizeMapper.this, "Latitude: " + latitude + ", Longitude: " + longitude, Toast.LENGTH_SHORT).show();
+                } else {
+                    // Unable to retrieve location
+                    Toast.makeText(OrganizeMapper.this, "Unable to retrieve location", Toast.LENGTH_SHORT).show();
+                }
+            }
+        }).addOnFailureListener(this, new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                // Location retrieval failed
+                Toast.makeText(OrganizeMapper.this, "Location retrieval failed", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+    }
+
+
+
+    private BitmapDescriptor bitdescriber(Context ctx,int vectorread)
+    {
+        Drawable vectordraw=ContextCompat.getDrawable(ctx,vectorread);
+        vectordraw.setBounds(0,0,vectordraw.getIntrinsicWidth(),vectordraw.getIntrinsicHeight());
+        Bitmap bitmap=Bitmap.createBitmap(vectordraw.getIntrinsicWidth(),vectordraw.getIntrinsicHeight(),Bitmap.Config.ARGB_8888);
+        Canvas canvas=new Canvas(bitmap);
+        vectordraw.draw(canvas);
+
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 }
