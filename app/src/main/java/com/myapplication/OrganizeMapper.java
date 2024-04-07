@@ -25,6 +25,9 @@ import android.provider.Settings;
 import android.text.TextUtils;
 import android.view.View;
 import android.view.ViewGroup;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -245,13 +248,28 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
         dialog.setContentView(view);
         dialog.setCancelable(false);// should not close after clicking outside the dialog box
         Button btn = dialog.findViewById(R.id.button);
+        Button can =dialog.findViewById(R.id.button1);
+        //event name
         editText = dialog.findViewById(R.id.editTextText);
+        //starttime
         editText1  = dialog.findViewById(R.id.editTextText4);
+        //event type
         textView = dialog.findViewById(R.id.textView2);
+        //StartDate
         dateEditText = dialog.findViewById(R.id.editTextText2);
+        //EndDate
         editText3 = dialog.findViewById(R.id.editTextText8);
+        //EndTime
         editText4 = dialog.findViewById(R.id.editTextText9);
         textView.setText(str);
+
+
+
+
+
+
+
+
         dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -291,6 +309,21 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
                     dateEditText.setError("Please Select the date");
                 }
                 else {
+
+                    String startTime = editText1.getText().toString();
+                    String endTime = editText4.getText().toString();
+
+                    String startDate = dateEditText.getText().toString();
+                    String endDate = editText3.getText().toString();
+
+
+                    String eventType = textView.getText().toString();
+                    String eventName = editText.getText().toString();
+
+                    // Add marker with the provided details
+                    addCustomMarker(markerDrawableId,latLng,eventType,eventName,startDate,startTime,endDate,endTime);
+
+
                     dialog.dismiss();
                 }
 
@@ -300,6 +333,46 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
 
     }
+
+
+
+    private void addCustomMarker(int markerDrawableId,LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime) {
+
+        // Get the corresponding marker icon based on event type
+
+        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(markerDrawableId);
+
+        // Add a marker at the clicked location and customize it
+        MarkerOptions markerOptions = new MarkerOptions()
+                .position(latLng)
+                .icon(icon)
+                .title("Custom Marker")
+                .snippet("Type: " + eventType +", Event Name : "+eventName+ ", Time: " + startTime + ", Date: " + startDate );
+        mMap.addMarker(markerOptions);
+
+        // Optionally, you can move the camera to the clicked location
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+
+        // Optionally, store marker details in Firebase Realtime Database
+        storeMarkerDetailsInFirebase(latLng,eventType,eventName,startDate,startTime,endDate,endTime);
+    }
+
+
+
+    private void storeMarkerDetailsInFirebase(LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime) {
+        // Store marker details in Firebase Realtime Database
+        DatabaseReference markersRef = FirebaseDatabase.getInstance().getReference("Google markers");
+        String markerId = markersRef.push().getKey();
+
+        if (markerId != null) {
+            MarkerDetails markerDetails = new MarkerDetails(latLng.latitude,latLng.longitude,eventType,eventName,startDate,startTime,endDate,endTime);
+            markersRef.child(eventName).setValue(markerDetails);
+        }
+    }
+
+
+
+
 
 
     private void showTimePickerDialog(EditText editText) {
