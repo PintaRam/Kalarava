@@ -18,18 +18,25 @@ import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+import android.location.Address;
+import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.text.Editable;
 import android.text.TextUtils;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.ViewGroup;
+
+import com.google.android.gms.maps.model.Marker;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -48,21 +55,28 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.myapplication.databinding.ActivityOrganizeMapperBinding;
 
+import java.io.IOException;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
+
+
 
 public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnMapClickListener {
 
     private GoogleMap mMap;
+    Marker previousMarker;
+
     final int PERMISSION_REQUEST_CODE=1001;
     final int REQUEST_CODE=101;
     private ActivityOrganizeMapperBinding binding;
     EditText editText,editText1,editText3 , editText4;
     TextView textView;
     private Calendar calendar;
-    EditText dateEditText;
+    EditText dateEditText,searchedit;
+    ImageView searchbtn;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -80,7 +94,57 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map2);
         mapFragment.getMapAsync(OrganizeMapper.this);
+
+
+        searchedit = findViewById(R.id.searchView);
+        searchbtn =  findViewById(R.id.imageView);
+
+        searchbtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String searchQuery = searchedit.getText().toString();
+                if (!searchQuery.isEmpty()) {
+                    // Perform Geocoding API request
+                    Geocoder geocoder = new Geocoder(getApplicationContext());
+                    try {
+                        List<Address> addresses = geocoder.getFromLocationName(searchQuery, 1);
+                        if (addresses != null && !addresses.isEmpty()) {
+                            Address address = addresses.get(0);
+                            LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
+
+                            // Move camera to searched location
+
+                            mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+
+                            if (previousMarker != null)
+                                previousMarker.remove();
+
+                            // Add marker for searched location
+                            previousMarker =  mMap.addMarker(new MarkerOptions().position(latLng).title(address.getFeatureName()));
+
+
+                        } else {
+                            Toast.makeText(getApplicationContext(), "Location not found", Toast.LENGTH_SHORT).show();
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else {
+                    searchedit.setError("Please Enter a city or Village");
+                }
+            }
+        });
+
     }
+
+
+
+
+//
+
+
+
 
     /**
      * Manipulates the map once available.
