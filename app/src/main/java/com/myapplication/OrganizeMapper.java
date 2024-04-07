@@ -247,7 +247,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
         Button btn = dialog.findViewById(R.id.button);
         editText = dialog.findViewById(R.id.editTextText);
         editText1  = dialog.findViewById(R.id.editTextText4);
-        textView = dialog.findViewById(R.id.textView);
+        textView = dialog.findViewById(R.id.textView2);
         dateEditText = dialog.findViewById(R.id.editTextText2);
         editText3 = dialog.findViewById(R.id.editTextText8);
         editText4 = dialog.findViewById(R.id.editTextText9);
@@ -255,27 +255,27 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
         dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDatePickerDialog();
+                showDatePickerDialog(dateEditText);
             }
         });
         editText3.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showDatePickerDialog();
+                showDatePickerDialog(editText3);
             }
         });
 
         editText4.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showTimePickerDialog(this);
+                showTimePickerDialog(editText4);
             }
         });
 
         editText1.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                showTimePickerDialog(this);
+                showTimePickerDialog(editText1);
             }
         });
 
@@ -302,26 +302,28 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
     }
 
 
-    private void showTimePickerDialog(View.OnClickListener context) {
-        final Calendar calendar = Calendar.getInstance();
-        int hour = calendar.get(Calendar.HOUR_OF_DAY);
-        int minute = calendar.get(Calendar.MINUTE);
+    private void showTimePickerDialog(EditText editText) {
+        // Get current time
+        final Calendar c = Calendar.getInstance();
+        int hour = c.get(Calendar.HOUR_OF_DAY);
+        int minute = c.get(Calendar.MINUTE);
 
+        // Create a new TimePickerDialog
         TimePickerDialog timePickerDialog = new TimePickerDialog(this,
                 new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
-                        // Set selected time to EditText
-                        String time = String.format("%02d:%02d", hourOfDay, minute);
-                        editText3.setText(time);
+                        // Update EditText with selected time
+                        editText.setText(String.format("%02d:%02d", hourOfDay, minute));
                     }
-                }, hour, minute, true);
+                }, hour, minute, false);
 
+        // Show the dialog
         timePickerDialog.show();
     }
 
 
-    private void showDatePickerDialog() {
+    private void showDatePickerDialog(EditText dateEditText) {
 
         DialogFragment newFragment = new DatePickerFragment(dateEditText);
         newFragment.show(getSupportFragmentManager(), "datePicker");
