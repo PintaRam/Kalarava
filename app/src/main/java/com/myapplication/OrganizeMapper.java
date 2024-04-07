@@ -124,7 +124,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
                     LatLng myloc=new LatLng(latitude,longitude);
-                    mMap.addMarker(new MarkerOptions().position(myloc).title("My Location").icon(bitdescriber(getApplicationContext(),R.drawable.loginimg)));
+                    mMap.addMarker(new MarkerOptions().position(myloc).title("My Location").icon(bitdescriber(getApplicationContext(),R.drawable.home)));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myloc,20));
 
                     // Do something with the obtained latitude and longitude
@@ -167,27 +167,27 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
                         switch (which) {
                             case 0:
                                 // Type 1 marker
-                                addCustomMarker(latLng, R.drawable.loginimg);
+                                addCustomMarker(latLng, R.drawable.hospital);
                                 break;
                             case 1:
                                 // Type 2 marker
-                                addCustomMarker(latLng, R.drawable.loginimg);
+                                addCustomMarker(latLng, R.drawable.marriage);
                                 break;
                             case 2:
                                 // Type 3 marker
-                                addCustomMarker(latLng, R.drawable.loginimg);
+                                addCustomMarker(latLng, R.drawable.hack);
                                 break;
                             case 3:
                                 addCustomMarker(latLng, R.drawable.edu);
                                 break;
                             case 4:
-                                addCustomMarker(latLng, R.drawable.edu);
+                                addCustomMarker(latLng, R.drawable.parking);
                                 break;
                             case 5:
-                                addCustomMarker(latLng, R.drawable.edu);
+                                addCustomMarker(latLng, R.drawable.bank);
                                 break;
                             case 6:
-                                addCustomMarker(latLng, R.drawable.edu);
+                                addCustomMarker(latLng, R.drawable.police);
                                 break;
                         }
                     }
