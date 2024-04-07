@@ -28,11 +28,18 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.events.Event;
 import com.karumi.dexter.Dexter;
 import com.karumi.dexter.PermissionToken;
 import com.karumi.dexter.listener.PermissionDeniedResponse;
@@ -67,6 +74,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         clientLocation = LocationServices.getFusedLocationProviderClient(this);
         mapFragment = (SupportMapFragment) getSupportFragmentManager().findFragmentById(R.id.map);
+
+
+
+
         mapFragment.getMapAsync(MapsActivity.this);
 
 
@@ -93,7 +104,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     if (destinationList != null && destinationList.size() > 0) {
                         Address destinationAddress = destinationList.get(0);
                         LatLng destinationLatLng = new LatLng(destinationAddress.getLatitude(), destinationAddress.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(destinationLatLng).title(userText));
+                        mMap.addMarker(new MarkerOptions().position(destinationLatLng).title("You Are Here").icon(BitmapDescriptorFactory.fromResource(R.drawable.user)));
                         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destinationLatLng, 12));
                     } else {
                         Toast.makeText(MapsActivity.this, "Location not found", Toast.LENGTH_SHORT).show();
@@ -116,46 +127,99 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
-        search_loc();
+        getlocation();
+        getOnGoingEvents();
+        //search_loc();
     }
 
-    private void getlocation()
+
+
+    private  void getOnGoingEvents()
     {
-        //Request for location access
-
-        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
-        }
-
-        showLocationTurnDialog();
-        // Inside onCreate() method, after checking location settings
-        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        //fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-        fusedLocationClient.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
-
+        //Marking Hosted Events in Gmap
+        DatabaseReference eventsRef = FirebaseDatabase.getInstance().getReference("Google markers");
+        eventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
-            public void onSuccess (Location location){
-                if (location != null) {
-                    // Use the location object to get latitude and longitude
-                    double latitude = location.getLatitude();
-                    double longitude = location.getLongitude();
-                    //LatLng userLocation = new LatLng(latitude, longitude);
-                    // Move the camera to the user's location
-//                    mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 12));
-//                    // Add a marker at the user's location
-//                    mMap.addMarker(new MarkerOptions().position(userLocation).title("My Location"));
-                } else {
-                    // Unable to retrieve location, show a message or handle it as needed
-                    Toast.makeText(MapsActivity.this, "Unable to retrieve location", Toast.LENGTH_SHORT).show();
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // Iterate through the events
+                for (DataSnapshot eventSnapshot : dataSnapshot.getChildren()) {
+                    /* Get event details */
+                    MarkerDetails event = eventSnapshot.getValue(MarkerDetails.class);
+                    String title=eventSnapshot.getKey();
+                    double latitude = event.getLatitude();
+                    double longitude = event.getLongitude();
+                    String description = event.getDescription();
+                    String type=event.getEventType();
+
+                    // Add marker for each event on the map
+
+                    LatLng eventLocation = new LatLng(latitude, longitude);
+                    int which_marker = R.drawable.user; // Default marker
+
+                    if ("Hospitals".equals(type)) {
+                        which_marker = R.drawable.hospital;
+                    } else if ("Marriage".equals(type)) {
+                        which_marker = R.drawable.marriage;
+                    } else if ("Hackathon".equals(type)) {
+                        which_marker = R.drawable.hack;
+                    } else if ("Bank".equals(type)) {
+                        which_marker = R.drawable.bank;
+                    } else if ("Educational".equals(type)) {
+                        which_marker = R.drawable.edu;
+                    } else if ("Police".equals(type)) {
+                        which_marker = R.drawable.police;
+                    } else if ("Parking".equals(type)) {
+                        which_marker = R.drawable.parking;
+                    }
+                    mMap.addMarker(new MarkerOptions()
+                            .position(eventLocation)
+                            .title(title)
+                            .snippet(description)
+                            .icon(BitmapDescriptorFactory.fromResource(which_marker))); // You can customize the marker icon as needed
                 }
             }
-        }).addOnFailureListener(this, new OnFailureListener() {
+
             @Override
-            public void onFailure(@NonNull Exception e) {
-                // Location retrieval failed
-                Toast.makeText(MapsActivity.this, "Location retrieval failed", Toast.LENGTH_SHORT).show();
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+                // Handle database error
+                Toast.makeText(MapsActivity.this, "Failed to retrieve events: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+    }
+
+    private void getlocation() {
+        // Check location permission
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+        } else {
+            // Location permission granted
+            showLocationTurnDialog();
+            // Get user's last known location
+            clientLocation.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
+                @Override
+                public void onSuccess(Location location) {
+                    if (location != null) {
+                        // Use the location object to get latitude and longitude
+                        double latitude = location.getLatitude();
+                        double longitude = location.getLongitude();
+                        LatLng userLocation = new LatLng(latitude, longitude);
+                        // Move the camera to the user's location
+                        mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(userLocation, 20));
+                        // Add a marker at the user's location
+                        mMap.addMarker(new MarkerOptions().position(userLocation).title("You are Here").icon(BitmapDescriptorFactory.fromResource(R.drawable.user)));
+                    } else {
+                        // Unable to retrieve location, show a message or handle it as needed
+                        Toast.makeText(MapsActivity.this, "Unable to retrieve location", Toast.LENGTH_SHORT).show();
+                    }
+                }
+            }).addOnFailureListener(this, new OnFailureListener() {
+                @Override
+                public void onFailure(@NonNull Exception e) {
+                    // Location retrieval failed
+                    Toast.makeText(MapsActivity.this, "Location retrieval failed", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
     }
     private void showLocationTurnDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
