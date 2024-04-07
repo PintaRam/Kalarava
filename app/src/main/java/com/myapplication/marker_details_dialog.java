@@ -50,10 +50,9 @@ public class marker_details_dialog extends AppCompatActivity {
             public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
                 // Display the selected date in the EditText
                 EditText editTextDate = findViewById(R.id.editTextDate);
-                editTextDate.setText(dayOfMonth + "/" + (monthOfYear + 1) + "/" + year);
+                editTextDate.setText(String.format(Locale.getDefault(), "%02d/%02d/%04d", dayOfMonth, monthOfYear + 1, year));
             }
         }, year, month, day);
         datePickerDialog.show();
     }
-
 }

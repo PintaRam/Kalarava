@@ -8,6 +8,8 @@ import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -19,11 +21,14 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.util.EventLog;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.TimePicker;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -42,12 +47,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.myapplication.databinding.ActivityOrganizeMapperBinding;
 
+import java.util.Calendar;
+import java.util.Locale;
+
 public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnMapClickListener {
 
     private GoogleMap mMap;
     final int PERMISSION_REQUEST_CODE=1001;
     final int REQUEST_CODE=101;
     private ActivityOrganizeMapperBinding binding;
+    private EditText editTextTime,editTextDate;
+    private String eventname;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -233,10 +243,13 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
             View dialogView = inflater.inflate(R.layout.activity_marker_details_dialog, null);
             builder.setView(dialogView);
 
-            final EditText editTextTime = dialogView.findViewById(R.id.editTextTime);
-            final EditText editTextDate = dialogView.findViewById(R.id.editTextDate);
+             editTextTime = dialogView.findViewById(R.id.editTextTime);
+             editTextDate = dialogView.findViewById(R.id.editTextDate);
             final EditText editTextDescription = dialogView.findViewById(R.id.editTextDescription);
             final Spinner spinnerEventType = dialogView.findViewById(R.id.spinnerEventType);
+            final EditText eventId =dialogView.findViewById(R.id.eventName);
+
+
 
             // Populate the spinner with event types
             ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
@@ -247,6 +260,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
             builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
                 @Override
                 public void onClick(DialogInterface dialogInterface, int i) {
+                     eventname=eventId.getText().toString();
                     String time = editTextTime.getText().toString();
                     String date = editTextDate.getText().toString();
                     String description = editTextDescription.getText().toString();
@@ -312,12 +326,51 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
     private void storeMarkerDetailsInFirebase(LatLng latLng, String eventType, String time, String date, String description) {
         // Store marker details in Firebase Realtime Database
-        DatabaseReference markersRef = FirebaseDatabase.getInstance().getReference("markers");
+        DatabaseReference markersRef = FirebaseDatabase.getInstance().getReference("Google markers");
         String markerId = markersRef.push().getKey();
 
         if (markerId != null) {
             MarkerDetails markerDetails = new MarkerDetails(latLng.latitude, latLng.longitude, eventType, time, date, description);
-            markersRef.child(markerId).setValue(markerDetails);
+            markersRef.child(eventname).setValue(markerDetails);
         }
     }
+
+    //inflatted activities methods
+    public void showDatePickerDialog(View v) {
+        Calendar calendar = Calendar.getInstance();
+        int year = calendar.get(Calendar.YEAR);
+        int month = calendar.get(Calendar.MONTH);
+        int day = calendar.get(Calendar.DAY_OF_MONTH);
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new DatePickerDialog.OnDateSetListener() {
+            @Override
+            public void onDateSet(DatePicker view, int year, int monthOfYear, int dayOfMonth) {
+                // Display the selected date in the EditText
+
+                editTextDate.setText(String.format(Locale.getDefault(), "%02d/%02d/%04d", dayOfMonth, monthOfYear + 1, year));
+            }
+        }, year, month, day);
+        datePickerDialog.show();
+    }
+
+    public void openTimePicker(View view) {
+        // Get current time
+        Calendar calendar = Calendar.getInstance();
+        int hour = calendar.get(Calendar.HOUR_OF_DAY);
+        int minute = calendar.get(Calendar.MINUTE);
+
+        // Create a TimePickerDialog and set the listener to handle the selected time
+        TimePickerDialog timePickerDialog = new TimePickerDialog(this,
+                new TimePickerDialog.OnTimeSetListener() {
+                    @Override
+                    public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        // Display the selected time in the EditText
+                        editTextTime.setText(String.format(Locale.getDefault(), "%02d:%02d", hourOfDay, minute));
+                    }
+                }, hour, minute, true); // true for 24 hour time
+
+        // Show the TimePickerDialog when EditText is clicked
+        timePickerDialog.show();
+    }
+
+
 }
