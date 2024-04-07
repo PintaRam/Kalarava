@@ -12,6 +12,9 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.Canvas;
+import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -24,6 +27,8 @@ import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -34,6 +39,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
     private GoogleMap mMap;
     final int PERMISSION_REQUEST_CODE=1001;
+    final int REQUEST_CODE=101;
     private ActivityOrganizeMapperBinding binding;
 
     @Override
@@ -117,7 +123,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
                     LatLng myloc=new LatLng(latitude,longitude);
-                    mMap.addMarker(new MarkerOptions().position(myloc).title("Marker in Sydney"));
+                    mMap.addMarker(new MarkerOptions().position(myloc).title("My Location").icon(bitdescriber(getApplicationContext(),R.drawable.home)));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myloc,20));
 
                     // Do something with the obtained latitude and longitude
@@ -135,5 +141,18 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
             }
         });
 
+    }
+
+
+
+    private BitmapDescriptor bitdescriber(Context ctx,int vectorread)
+    {
+        Drawable vectordraw=ContextCompat.getDrawable(ctx,vectorread);
+        vectordraw.setBounds(0,0,vectordraw.getIntrinsicWidth(),vectordraw.getIntrinsicHeight());
+        Bitmap bitmap=Bitmap.createBitmap(vectordraw.getIntrinsicWidth(),vectordraw.getIntrinsicHeight(),Bitmap.Config.ARGB_8888);
+        Canvas canvas=new Canvas(bitmap);
+        vectordraw.draw(canvas);
+
+        return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
 }
