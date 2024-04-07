@@ -49,7 +49,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map2);
-        mapFragment.getMapAsync(this);
+        mapFragment.getMapAsync(OrganizeMapper.this);
     }
 
     /**
