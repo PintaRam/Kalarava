@@ -3,8 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <uses-permission android:name="android.permission.INTERNET" />
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-<!--    map location permission -->
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" /> <!-- map location permission -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
 
@@ -18,7 +17,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Reva_Events_Room"
         tools:targetApi="31">
-
+        <activity
+            android:name=".marker_details_dialog"
+            android:exported="false" />
         <!--
              TODO: Before you run your application, you need a Google Maps API key.
 
@@ -30,8 +31,8 @@
              project's local.properties file (e.g. MAPS_API_KEY=Aiza...), and replace the
              "YOUR_API_KEY" string in this file with "${MAPS_API_KEY}".
         -->
-<!--        map key which is taken from google that will will try to open the map -->
-<!--        Goto to cloud.google website and create an key-->
+        <!-- map key which is taken from google that will will try to open the map -->
+        <!-- Goto to cloud.google website and create an key -->
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="@string/maps_api_key" />

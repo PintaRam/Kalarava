@@ -19,6 +19,11 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.Spinner;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -33,6 +38,8 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 import com.myapplication.databinding.ActivityOrganizeMapperBinding;
 
 public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnMapClickListener {
@@ -124,7 +131,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
                     double latitude = location.getLatitude();
                     double longitude = location.getLongitude();
                     LatLng myloc=new LatLng(latitude,longitude);
-                    mMap.addMarker(new MarkerOptions().position(myloc).title("My Location").icon(bitdescriber(getApplicationContext(),R.drawable.home)));
+                    mMap.addMarker(new MarkerOptions().position(myloc).title("My Location").icon(BitmapDescriptorFactory.fromResource(R.drawable.home)));
                     mMap.moveCamera(CameraUpdateFactory.newLatLngZoom(myloc,20));
 
                     // Do something with the obtained latitude and longitude
@@ -146,6 +153,9 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
     @Override
     public void onMapClick(LatLng latLng) {
+      showMarkerDetailsDialog(latLng);
+    }
+
         // Custom marker icon
         //BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(R.drawable.marriage);
 
@@ -158,6 +168,9 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
         // mMap.addMarker(new MarkerOptions().position(latLng).icon(icon).title("Custom Marker").snippet("This is a custom marker"));
 
         // Optionally, you can move the camera to the clicked location
+
+
+        /*
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Select Marker Type")
                 .setItems(new CharSequence[]{"Hospitals","Marriage", "Hackathons", "Institutes","Parking","Banks","Police"}, new DialogInterface.OnClickListener() {
@@ -195,7 +208,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
         builder.show();
     }
 
-//For setting Custmised icons from drawable
+//For setting Customised icons from drawable
     private void addCustomMarker(LatLng latLng, int markerDrawableId) {
         // Custom marker icon
         BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(markerDrawableId);
@@ -210,15 +223,101 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
     }
 
+*/
 
-    private BitmapDescriptor bitdescriber(Context ctx,int vectorread)
-    {
-        Drawable vectordraw=ContextCompat.getDrawable(ctx,vectorread);
-        vectordraw.setBounds(0,0,vectordraw.getIntrinsicWidth(),vectordraw.getIntrinsicHeight());
-        Bitmap bitmap=Bitmap.createBitmap(vectordraw.getIntrinsicWidth(),vectordraw.getIntrinsicHeight(),Bitmap.Config.ARGB_8888);
-        Canvas canvas=new Canvas(bitmap);
-        vectordraw.draw(canvas);
 
-        return BitmapDescriptorFactory.fromBitmap(bitmap);
+        //For storing marker Info in
+        private void showMarkerDetailsDialog ( final LatLng latLng){
+            AlertDialog.Builder builder = new AlertDialog.Builder(OrganizeMapper.this);
+            LayoutInflater inflater = this.getLayoutInflater();
+            View dialogView = inflater.inflate(R.layout.activity_marker_details_dialog, null);
+            builder.setView(dialogView);
+
+            final EditText editTextTime = dialogView.findViewById(R.id.editTextTime);
+            final EditText editTextDate = dialogView.findViewById(R.id.editTextDate);
+            final EditText editTextDescription = dialogView.findViewById(R.id.editTextDescription);
+            final Spinner spinnerEventType = dialogView.findViewById(R.id.spinnerEventType);
+
+            // Populate the spinner with event types
+            ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                    R.array.event_types_array, android.R.layout.simple_spinner_item);
+            adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+            spinnerEventType.setAdapter(adapter);
+
+            builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    String time = editTextTime.getText().toString();
+                    String date = editTextDate.getText().toString();
+                    String description = editTextDescription.getText().toString();
+                    String eventType = spinnerEventType.getSelectedItem().toString();
+
+                    // Add marker with the provided details
+                    addCustomMarker(latLng, eventType, time, date, description);
+                }
+            });
+
+            builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+                @Override
+                public void onClick(DialogInterface dialogInterface, int i) {
+                    dialogInterface.cancel();
+                }
+            });
+
+            builder.show();
+        }
+
+    private void addCustomMarker(LatLng latLng, String eventType, String time, String date, String description) {
+        // Get the corresponding marker icon based on event type
+        int markerDrawableId = getMarkerDrawableId(eventType);
+        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(markerDrawableId);
+
+        // Add a marker at the clicked location and customize it
+        MarkerOptions markerOptions = new MarkerOptions()
+                .position(latLng)
+                .icon(icon)
+                .title("Custom Marker")
+                .snippet("Type: " + eventType + ", Time: " + time + ", Date: " + date + ", Description: " + description);
+        mMap.addMarker(markerOptions);
+
+        // Optionally, you can move the camera to the clicked location
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+
+        // Optionally, store marker details in Firebase Realtime Database
+        storeMarkerDetailsInFirebase(latLng, eventType, time, date, description);
+    }
+
+    private int getMarkerDrawableId(String eventType) {
+        // Implement logic to map event type to corresponding marker drawable resource
+        // For example:
+        switch (eventType) {
+            case "Hospitals":
+                return R.drawable.hospital;
+            case "Marriage":
+                return R.drawable.marriage;
+            case "Hackathon":
+                return R.drawable.hack;
+            case "Bank":
+                return  R.drawable.bank;
+            case "Educational":
+                return R.drawable.edu;
+            case "Police":
+                return R.drawable.police;
+            case "Parking":
+                return R.drawable.parking;
+            default:
+                return R.drawable.home;
+        }
+    }
+
+    private void storeMarkerDetailsInFirebase(LatLng latLng, String eventType, String time, String date, String description) {
+        // Store marker details in Firebase Realtime Database
+        DatabaseReference markersRef = FirebaseDatabase.getInstance().getReference("markers");
+        String markerId = markersRef.push().getKey();
+
+        if (markerId != null) {
+            MarkerDetails markerDetails = new MarkerDetails(latLng.latitude, latLng.longitude, eventType, time, date, description);
+            markersRef.child(markerId).setValue(markerDetails);
+        }
     }
 }
