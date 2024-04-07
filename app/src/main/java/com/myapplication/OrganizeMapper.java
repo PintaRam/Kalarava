@@ -48,7 +48,10 @@ import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.myapplication.databinding.ActivityOrganizeMapperBinding;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.Date;
 
 public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnMapClickListener {
 
@@ -229,17 +232,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
 //For setting Custmised icons from drawable
     private void addCustomMarker(String str ,LatLng latLng, int markerDrawableId) {
-        // Custom marker icon
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(markerDrawableId);
 
-        // Add a marker at the clicked location and customize it
-        mMap.addMarker(new MarkerOptions()
-                .position(latLng)
-                .icon(icon)
-                .title("Custom Marker"));
-
-        // Optionally, you can move the camera to the clicked location
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
 
 
         Dialog dialog = new Dialog(this);
@@ -297,28 +290,43 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
             }
         });
 
+
+
         btn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if(TextUtils.isEmpty(editText.getText().toString()))
+
+                String startTime = editText1.getText().toString();
+                String endTime = editText4.getText().toString();
+
+                String startDate = dateEditText.getText().toString();
+                String endDate = editText3.getText().toString();
+
+
+                String eventType = textView.getText().toString();
+                String eventName = editText.getText().toString();
+
+
+                if(TextUtils.isEmpty(eventName))
                 {
                     editText.setError("Please Enter the Name ");
-                } else if (TextUtils.isEmpty(editText1.getText().toString())) {
-                    editText1.setError("Please select the time");
-                } else if (TextUtils.isEmpty(dateEditText.getText().toString())) {
-                    dateEditText.setError("Please Select the date");
+                } else if (TextUtils.isEmpty(startTime)) {
+                    editText1.setError("Please select the start time");
+                }else if (TextUtils.isEmpty(endTime)) {
+                    editText1.setError("Please select the End time");
                 }
-                else {
+                else if (TextUtils.isEmpty(startDate)) {
+                    dateEditText.setError("Please Select the Start date");
+                }
+                else if (TextUtils.isEmpty(endDate)) {
+                    dateEditText.setError("Please Select the End date");
+                } else if (isStartDateAfterEndDate(startDate,endDate) == true) {
+                    dateEditText.setError("Enter correct date");
+                    editText3.setError("Enter correct date");
+                    Toast.makeText(OrganizeMapper.this, "Please Enter the Correct Information", Toast.LENGTH_SHORT).show();
+                } else {
 
-                    String startTime = editText1.getText().toString();
-                    String endTime = editText4.getText().toString();
 
-                    String startDate = dateEditText.getText().toString();
-                    String endDate = editText3.getText().toString();
-
-
-                    String eventType = textView.getText().toString();
-                    String eventName = editText.getText().toString();
 
                     // Add marker with the provided details
                     addCustomMarker(markerDrawableId,latLng,eventType,eventName,startDate,startTime,endDate,endTime);
@@ -329,11 +337,38 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
             }
         });
+
+        can.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                dialog.dismiss();
+            }
+        });
         dialog.show();
 
 
     }
 
+
+    public static boolean isStartDateAfterEndDate(String startDate, String endDate) {
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy");
+        try {
+            Date StartDate = sdf.parse(startDate);
+            Date EndDate = sdf.parse(endDate);
+
+            // Compare start date with end date
+            if (StartDate.compareTo(EndDate) > 0) {
+                // Start date is greater than end date
+                return true;
+            }
+        } catch (ParseException e) {
+            e.printStackTrace();
+            // Handle parse exception
+        }
+
+        // Start date is not greater than end date
+        return false;
+    }
 
 
     private void addCustomMarker(int markerDrawableId,LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime) {

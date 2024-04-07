@@ -60,19 +60,19 @@ public class MarkerDetails {
         this.eventType = eventType;
     }
 
-    public String getTime() {
+    public String getTime1() {
         return startTime;
     }
 
-    public void setTime(String startTime) {
+    public void setTime1(String startTime) {
         this.startTime = startTime;
     }
 
-    public String getDate() {
+    public String getDate1() {
         return startDate;
     }
 
-    public void setDate(String startDate) {
+    public void setDate1(String startDate) {
         this.startDate = startDate;
     }
 
