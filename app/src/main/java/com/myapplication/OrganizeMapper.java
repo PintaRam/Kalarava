@@ -310,33 +310,22 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 //        Button btn = dialog.findViewById(R.id.button);
 //        Button can =dialog.findViewById(R.id.button1);
 
-
-
         AlertDialog.Builder builder = new AlertDialog.Builder(OrganizeMapper.this);
         LayoutInflater inflater = this.getLayoutInflater();
         View dialog = inflater.inflate(R.layout.activity_marker_details_dialog, null);
         builder.setView(dialog);
         builder.setCancelable(false);
 
-        //event name
+// Initialize Views
         editText = dialog.findViewById(R.id.editTextText);
-        //starttime
-        editText1  = dialog.findViewById(R.id.editTextText4);
-        //event type
+        editText1 = dialog.findViewById(R.id.editTextText4);
         textView = dialog.findViewById(R.id.textView2);
-        //StartDate
         dateEditText = dialog.findViewById(R.id.editTextText2);
-        //EndDate
         editText3 = dialog.findViewById(R.id.editTextText8);
-        //EndTime
         editText4 = dialog.findViewById(R.id.editTextText9);
         desedit = dialog.findViewById(R.id.editTextDescription);
 
         textView.setText(str);
-
-
-
-
 
         dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -365,58 +354,10 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
             }
         });
 
+// Set positive button click listener
+        builder.setPositiveButton("OK", null);
 
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialogInterface, int i) {
-
-                String startTime = editText1.getText().toString();
-                String endTime = editText4.getText().toString();
-
-                String startDate = dateEditText.getText().toString();
-                String endDate = editText3.getText().toString();
-
-
-                String eventType = textView.getText().toString();
-                String eventName = editText.getText().toString();
-
-                String description = desedit.getText().toString();
-
-
-                if(TextUtils.isEmpty(eventName))
-                {
-                    editText.setError("Please Enter the Name ");
-                } else if (TextUtils.isEmpty(startTime)) {
-                    editText1.setError("Please select the start time");
-                }else if (TextUtils.isEmpty(endTime)) {
-                    editText1.setError("Please select the End time");
-                }
-                else if (TextUtils.isEmpty(startDate)) {
-                    dateEditText.setError("Please Select the Start date");
-                }
-                else if (TextUtils.isEmpty(endDate)) {
-                    dateEditText.setError("Please Select the End date");
-                } else if (isStartDateAfterEndDate(startDate,endDate) == true) {
-                    dateEditText.setError("Enter correct date");
-                    editText3.setError("Enter correct date");
-                    Toast.makeText(OrganizeMapper.this, "Please Enter the Correct Information", Toast.LENGTH_SHORT).show();
-                } else if (TextUtils.isEmpty(description)) {
-                    desedit.setError("Please Enter Description");
-                } else {
-
-
-
-                    // Add marker with the provided details
-                    addCustomMarker(markerDrawableId,latLng,eventType,eventName,startDate,startTime,endDate,endTime,description);
-
-
-                   dialogInterface.cancel();
-                }
-
-            }
-        });
-
+// Set negative button click listener
         builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
@@ -424,10 +365,53 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
             }
         });
 
+// Create the AlertDialog
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                Button buttonPositive = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                buttonPositive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Retrieve input values
+                        String startTime = editText1.getText().toString();
+                        String endTime = editText4.getText().toString();
+                        String startDate = dateEditText.getText().toString();
+                        String endDate = editText3.getText().toString();
+                        String eventType = textView.getText().toString();
+                        String eventName = editText.getText().toString();
+                        String description = desedit.getText().toString();
 
+                        // Validate inputs
+                        if (TextUtils.isEmpty(eventName)) {
+                            editText.setError("Please Enter the Name");
+                        } else if (TextUtils.isEmpty(startTime)) {
+                            editText1.setError("Please select the start time");
+                        } else if (TextUtils.isEmpty(endTime)) {
+                            editText4.setError("Please select the End time");
+                        } else if (TextUtils.isEmpty(startDate)) {
+                            dateEditText.setError("Please Select the Start date");
+                        } else if (TextUtils.isEmpty(endDate)) {
+                            editText3.setError("Please Select the End date");
+                        } else if (isStartDateAfterEndDate(startDate, endDate)) {
+                            dateEditText.setError("Enter correct date");
+                            editText3.setError("Enter correct date");
+                            Toast.makeText(OrganizeMapper.this, "Please Enter the Correct Information", Toast.LENGTH_SHORT).show();
+                        } else if (TextUtils.isEmpty(description)) {
+                            desedit.setError("Please Enter Description");
+                        } else {
+                            // Add marker with the provided details
+                            addCustomMarker(markerDrawableId, latLng, eventType, eventName, startDate, startTime, endDate, endTime, description);
+                            alertDialog.dismiss();
+                        }
+                    }
+                });
+            }
+        });
 
-
-        builder.show();
+// Show the dialog
+        alertDialog.show();
 
 
 
