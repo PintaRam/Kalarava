@@ -62,35 +62,35 @@ public class MarkerDetails {
         this.eventType = eventType;
     }
 
-    public String getTime1() {
+    public String getStartTime() {
         return startTime;
     }
 
-    public void setTime1(String startTime) {
+    public void setStartTime(String startTime) {
         this.startTime = startTime;
     }
 
-    public String getDate1() {
+    public String getStartDate() {
         return startDate;
     }
 
-    public void setDate1(String startDate) {
+    public void setStartDate(String startDate) {
         this.startDate = startDate;
     }
 
-    public String getTime() {
+    public String getEndTime() {
         return endTime;
     }
 
-    public void setTime(String endTime) {
+    public void setEndTime(String endTime) {
         this.endTime =endTime;
     }
 
-    public String getDate() {
+    public String getEndDate() {
         return endDate;
     }
 
-    public void setDate(String endDate) {
+    public void setEndDate(String endDate) {
         this.endDate = endDate;
     }
 
