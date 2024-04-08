@@ -8,6 +8,7 @@ import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.TimePickerDialog;
@@ -27,6 +28,7 @@ import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
@@ -72,7 +74,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
     final int PERMISSION_REQUEST_CODE=1001;
     final int REQUEST_CODE=101;
     private ActivityOrganizeMapperBinding binding;
-    EditText editText,editText1,editText3 , editText4;
+    EditText editText,editText1,editText3 , editText4,desedit;
     TextView textView;
     private Calendar calendar;
     EditText dateEditText,searchedit;
@@ -295,37 +297,35 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
     }
 
 //For setting Custmised icons from drawable
-    private void addCustomMarker(String str ,LatLng latLng, int markerDrawableId) {
+    @SuppressLint("MissingInflatedId")
+    private void addCustomMarker(String str , LatLng latLng, int markerDrawableId) {
 
 
 
-        Dialog dialog = new Dialog(this);
-        dialog.setContentView(R.layout.cust_dialog);
-        View view = getLayoutInflater().inflate(R.layout.cust_dialog, (ViewGroup) findViewById(R.id.rel));
-        dialog.setContentView(view);
-        dialog.setCancelable(false);// should not close after clicking outside the dialog box
-        Button btn = dialog.findViewById(R.id.button);
-        Button can =dialog.findViewById(R.id.button1);
-        //event name
+//        Dialog dialog = new Dialog(this);
+//        dialog.setContentView(R.layout.cust_dialog);
+//        View view = getLayoutInflater().inflate(R.layout.cust_dialog, (ViewGroup) findViewById(R.id.rel));
+//        dialog.setContentView(view);
+//        dialog.setCancelable(false);// should not close after clicking outside the dialog box
+//        Button btn = dialog.findViewById(R.id.button);
+//        Button can =dialog.findViewById(R.id.button1);
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(OrganizeMapper.this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialog = inflater.inflate(R.layout.activity_marker_details_dialog, null);
+        builder.setView(dialog);
+        builder.setCancelable(false);
+
+// Initialize Views
         editText = dialog.findViewById(R.id.editTextText);
-        //starttime
-        editText1  = dialog.findViewById(R.id.editTextText4);
-        //event type
+        editText1 = dialog.findViewById(R.id.editTextText4);
         textView = dialog.findViewById(R.id.textView2);
-        //StartDate
         dateEditText = dialog.findViewById(R.id.editTextText2);
-        //EndDate
         editText3 = dialog.findViewById(R.id.editTextText8);
-        //EndTime
         editText4 = dialog.findViewById(R.id.editTextText9);
+        desedit = dialog.findViewById(R.id.editTextDescription);
+
         textView.setText(str);
-
-
-
-
-
-
-
 
         dateEditText.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -354,61 +354,87 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
             }
         });
 
+// Set positive button click listener
+        builder.setPositiveButton("OK", null);
 
-
-        btn.setOnClickListener(new View.OnClickListener() {
+// Set negative button click listener
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
-            public void onClick(View v) {
-
-                String startTime = editText1.getText().toString();
-                String endTime = editText4.getText().toString();
-
-                String startDate = dateEditText.getText().toString();
-                String endDate = editText3.getText().toString();
-
-
-                String eventType = textView.getText().toString();
-                String eventName = editText.getText().toString();
-
-
-                if(TextUtils.isEmpty(eventName))
-                {
-                    editText.setError("Please Enter the Name ");
-                } else if (TextUtils.isEmpty(startTime)) {
-                    editText1.setError("Please select the start time");
-                }else if (TextUtils.isEmpty(endTime)) {
-                    editText1.setError("Please select the End time");
-                }
-                else if (TextUtils.isEmpty(startDate)) {
-                    dateEditText.setError("Please Select the Start date");
-                }
-                else if (TextUtils.isEmpty(endDate)) {
-                    dateEditText.setError("Please Select the End date");
-                } else if (isStartDateAfterEndDate(startDate,endDate) == true) {
-                    dateEditText.setError("Enter correct date");
-                    editText3.setError("Enter correct date");
-                    Toast.makeText(OrganizeMapper.this, "Please Enter the Correct Information", Toast.LENGTH_SHORT).show();
-                } else {
-
-
-
-                    // Add marker with the provided details
-                    addCustomMarker(markerDrawableId,latLng,eventType,eventName,startDate,startTime,endDate,endTime);
-
-
-                    dialog.dismiss();
-                }
-
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
             }
         });
 
-        can.setOnClickListener(new View.OnClickListener() {
+// Create the AlertDialog
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
             @Override
-            public void onClick(View v) {
-                dialog.dismiss();
+            public void onShow(DialogInterface dialog) {
+                Button buttonPositive = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                buttonPositive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        // Retrieve input values
+                        String startTime = editText1.getText().toString();
+                        String endTime = editText4.getText().toString();
+                        String startDate = dateEditText.getText().toString();
+                        String endDate = editText3.getText().toString();
+                        String eventType = textView.getText().toString();
+                        String eventName = editText.getText().toString();
+                        String description = desedit.getText().toString();
+
+                        // Validate inputs
+                        if (TextUtils.isEmpty(eventName)) {
+                            editText.setError("Please Enter the Name");
+                        } else if (TextUtils.isEmpty(startTime)) {
+                            editText1.setError("Please select the start time");
+                        } else if (TextUtils.isEmpty(endTime)) {
+                            editText4.setError("Please select the End time");
+                        } else if (TextUtils.isEmpty(startDate)) {
+                            dateEditText.setError("Please Select the Start date");
+                        } else if (TextUtils.isEmpty(endDate)) {
+                            editText3.setError("Please Select the End date");
+                        } else if (isStartDateAfterEndDate(startDate, endDate)) {
+                            dateEditText.setError("Enter correct date");
+                            editText3.setError("Enter correct date");
+                            Toast.makeText(OrganizeMapper.this, "Please Enter the Correct Information", Toast.LENGTH_SHORT).show();
+                        } else if (TextUtils.isEmpty(description)) {
+                            desedit.setError("Please Enter Description");
+                        } else {
+                            // Add marker with the provided details
+                            addCustomMarker(markerDrawableId, latLng, eventType, eventName, startDate, startTime, endDate, endTime, description);
+                            alertDialog.dismiss();
+                        }
+                    }
+                });
             }
         });
-        dialog.show();
+
+// Show the dialog
+        alertDialog.show();
+
+
+
+
+
+
+
+
+
+//        btn.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//
+//            }
+//        });
+
+//        can.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                dialog.dismiss();
+//            }
+//        });
+//
 
 
     }
@@ -435,7 +461,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
     }
 
 
-    private void addCustomMarker(int markerDrawableId,LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime) {
+    private void addCustomMarker(int markerDrawableId,LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime,String description) {
 
         // Get the corresponding marker icon based on event type
 
@@ -446,25 +472,25 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
                 .position(latLng)
                 .icon(icon)
                 .title("Custom Marker")
-                .snippet("Type: " + eventType +", Event Name : "+eventName+ ", Time: " + startTime + ", Date: " + startDate );
+                .snippet("Type: " + eventType +", Event Name : "+eventName+ ", Time: " + startTime + ", Date: " + startDate+", Description : "+description );
         mMap.addMarker(markerOptions);
 
         // Optionally, you can move the camera to the clicked location
         mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
 
         // Optionally, store marker details in Firebase Realtime Database
-        storeMarkerDetailsInFirebase(latLng,eventType,eventName,startDate,startTime,endDate,endTime);
+        storeMarkerDetailsInFirebase(latLng,eventType,eventName,startDate,startTime,endDate,endTime,description);
     }
 
 
 
-    private void storeMarkerDetailsInFirebase(LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime) {
+    private void storeMarkerDetailsInFirebase(LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime,String description) {
         // Store marker details in Firebase Realtime Database
         DatabaseReference markersRef = FirebaseDatabase.getInstance().getReference("Google markers");
         String markerId = markersRef.push().getKey();
 
         if (markerId != null) {
-            MarkerDetails markerDetails = new MarkerDetails(latLng.latitude,latLng.longitude,eventType,eventName,startDate,startTime,endDate,endTime);
+            MarkerDetails markerDetails = new MarkerDetails(latLng.latitude,latLng.longitude,eventType,eventName,startDate,startTime,endDate,endTime,description);
             markersRef.child(eventName).setValue(markerDetails);
         }
     }
