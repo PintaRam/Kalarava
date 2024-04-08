@@ -187,13 +187,21 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
+
+    public static boolean isGPSEnabled(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        return locationManager != null && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
     private void getlocation() {
         // Check location permission
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
         } else {
-            // Location permission granted
-            showLocationTurnDialog();
+            if (!MapsActivity.isGPSEnabled(this)) {
+                // Location permission granted
+                showLocationTurnDialog();
+            }
             // Get user's last known location
             clientLocation.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
                 @Override
