@@ -10,13 +10,14 @@ public class MarkerDetails {
     private String startDate;
 
     private String endDate;
+    private  String description;
 
 
     public MarkerDetails() {
         // Default constructor required for Firebase
     }
 
-    public MarkerDetails(double latitude, double longitude, String eventType,String name, String startTime, String startDate,String endDate,String endTime) {
+    public MarkerDetails(double latitude, double longitude, String eventType,String name, String startTime, String startDate,String endDate,String endTime,String description) {
         this.ename=name;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -25,6 +26,7 @@ public class MarkerDetails {
         this.endTime = endTime;
         this.startDate = endDate;
         this.endDate =endDate;
+        this.description = description;
     }
 
     public  String getevent()
@@ -90,6 +92,14 @@ public class MarkerDetails {
 
     public void setDate(String endDate) {
         this.endDate = endDate;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
 

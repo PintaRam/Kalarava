@@ -148,7 +148,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     String title=eventSnapshot.getKey();
                     double latitude = event.getLatitude();
                     double longitude = event.getLongitude();
-                   
+                    String description = event.getDescription();
                     String type=event.getEventType();
 
                     // Add marker for each event on the map
@@ -174,7 +174,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     mMap.addMarker(new MarkerOptions()
                             .position(eventLocation)
                             .title(title)
-                            
+                            .snippet(description)
                             .icon(BitmapDescriptorFactory.fromResource(which_marker))); // You can customize the marker icon as needed
                 }
             }
