@@ -27,7 +27,7 @@ public class PendingFrag extends Fragment {
 
         if(getArguments()!=null)
         {  Double latitude = getArguments().getDouble("latitude");
-                Double Longitude = getArguments().getDouble("longitude")
+                Double Longitude = getArguments().getDouble("longitude");
             String eventType =  getArguments().getString("eventType");
             String eventName =  getArguments().getString("eventName");
             String startDate =  getArguments().getString("startDate");
