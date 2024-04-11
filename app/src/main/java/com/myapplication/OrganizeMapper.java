@@ -6,6 +6,9 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 import androidx.fragment.app.DialogFragment;
 import androidx.fragment.app.FragmentActivity;
+import javax.mail.*;
+import javax.mail.internet.*;
+import java.util.Properties;
 
 import android.Manifest;
 import android.annotation.SuppressLint;
@@ -33,6 +36,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.maps.model.Marker;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 
@@ -276,7 +281,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
                                 break;
                             case 2:
                                 // Type 3 marker
-                                addCustomMarker("HackThon",latLng, R.drawable.hack);
+                                addCustomMarker("Hackathon",latLng, R.drawable.hack);
                                 break;
                             case 3:
                                 addCustomMarker("Education",latLng, R.drawable.edu);
@@ -465,22 +470,28 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
         // Get the corresponding marker icon based on event type
 
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(markerDrawableId);
 
-        // Add a marker at the clicked location and customize it
-        MarkerOptions markerOptions = new MarkerOptions()
-                .position(latLng)
-                .icon(icon)
-                .title("Custom Marker")
-                .snippet("Type: " + eventType +", Event Name : "+eventName+ ", Time: " + startTime + ", Date: " + startDate+", Description : "+description );
-        mMap.addMarker(markerOptions);
 
-        // Optionally, you can move the camera to the clicked location
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
 
-        // Optionally, store marker details in Firebase Realtime Database
+//        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(markerDrawableId);
+//
+//        // Add a marker at the clicked location and customize it
+//        MarkerOptions markerOptions = new MarkerOptions()
+//                .position(latLng)
+//                .icon(icon)
+//                .title("Custom Marker")
+//                .snippet("Type: " + eventType +", Event Name : "+eventName+ ", Time: " + startTime + ", Date: " + startDate+", Description : "+description );
+//        mMap.addMarker(markerOptions);
+//
+//        // Optionally, you can move the camera to the clicked location
+//        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+
+       //  Optionally, store marker details in Firebase Realtime Database
         storeMarkerDetailsInFirebase(latLng,eventType,eventName,startDate,startTime,endDate,endTime,description);
     }
+
+
+
 
 
 
@@ -493,6 +504,19 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
             MarkerDetails markerDetails = new MarkerDetails(latLng.latitude,latLng.longitude,eventType,eventName,startDate,startTime,endDate,endTime,description);
             markersRef.child(eventName).setValue(markerDetails);
         }
+
+        Bundle bundle = new Bundle();
+        bundle.putDouble("latitude",latLng.latitude);
+        bundle.putDouble("longitude",latLng.longitude);
+        bundle.putString("eventType",eventType);
+        bundle.putString("eventName",eventName);
+        bundle.putString("startDate",startDate);
+        bundle.putString("endDate",endDate);
+        bundle.putString("startTime",startTime);
+        bundle.putString("endTime",endTime);
+        bundle.putString("Decription",description);
+
+
     }
 
 

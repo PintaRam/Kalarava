@@ -208,7 +208,10 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
                                 Toast.makeText(Register.this, "Organiser Email already registered. Please use a different email.", Toast.LENGTH_SHORT).show();
                             } else {
                                 // Email does not exist in the database, proceed with registration
+
                                 addOrganiserDetails(name,user);
+                                Intent intent = new Intent(Register.this,OrganizeMapper.class);
+                                startActivity(intent);
                             }
                         }
 
@@ -236,8 +239,8 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
                     @Override
                     public void run() {
                         Toast.makeText(Register.this,"Registration Successfull !!!!",Toast.LENGTH_LONG).show();
-                        Intent i=new Intent(Register.this,Login.class);
-                        startActivity(i);
+                        //Intent i=new Intent(Register.this,Login.class);
+                       // startActivity(i);
                     }
                 },10000 );
 
