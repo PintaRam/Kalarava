@@ -473,18 +473,18 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
 
 
-        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(markerDrawableId);
-
-        // Add a marker at the clicked location and customize it
-        MarkerOptions markerOptions = new MarkerOptions()
-                .position(latLng)
-                .icon(icon)
-                .title("Custom Marker")
-                .snippet("Type: " + eventType +", Event Name : "+eventName+ ", Time: " + startTime + ", Date: " + startDate+", Description : "+description );
-        mMap.addMarker(markerOptions);
-
-        // Optionally, you can move the camera to the clicked location
-        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
+//        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(markerDrawableId);
+//
+//        // Add a marker at the clicked location and customize it
+//        MarkerOptions markerOptions = new MarkerOptions()
+//                .position(latLng)
+//                .icon(icon)
+//                .title("Custom Marker")
+//                .snippet("Type: " + eventType +", Event Name : "+eventName+ ", Time: " + startTime + ", Date: " + startDate+", Description : "+description );
+//        mMap.addMarker(markerOptions);
+//
+//        // Optionally, you can move the camera to the clicked location
+//        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
 
        //  Optionally, store marker details in Firebase Realtime Database
         storeMarkerDetailsInFirebase(latLng,eventType,eventName,startDate,startTime,endDate,endTime,description);

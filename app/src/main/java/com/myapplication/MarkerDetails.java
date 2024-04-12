@@ -29,6 +29,12 @@ public class MarkerDetails {
         this.description = description;
     }
 
+    public MarkerDetails( String eventType,String name, String startTime) {
+        this.ename=name;
+        this.eventType = eventType;
+        this.startTime =startTime;
+
+    }
     public  String getevent()
     {
         return this.ename;
