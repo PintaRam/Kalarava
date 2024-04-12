@@ -18,7 +18,10 @@
         android:theme="@style/Theme.Reva_Events_Room"
         tools:targetApi="31">
         <activity
-            android:name=".RecyclerAdmin"
+            android:name=".contact"
+            android:exported="false" />
+        <activity
+            android:name=".recyclerContact"
             android:exported="false" />
         <activity
             android:name=".updateMarkerByAdmin"
