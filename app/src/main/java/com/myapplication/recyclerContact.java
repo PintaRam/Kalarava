@@ -1,14 +1,23 @@
 package com.myapplication;
 import android.app.AlertDialog;
 import android.content.Context;
+import android.location.Geocoder;
 import android.util.Log;
 import android.view.LayoutInflater;
+
+import java.io.IOException;
+import java.util.List;
+import java.util.Locale;
 import android.view.View;
+import android.location.Address;
+import android.location.Geocoder;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
+import android.widget.Toast;
+import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -38,8 +47,26 @@ public class recyclerContact extends RecyclerView.Adapter<recyclerContact.viewho
     @Override
     public void onBindViewHolder(@NonNull viewholder holder, int position) {
         holder.txt1.setText(list.get(position).getEventType());
-        holder.txt2.setText(list.get(position).getEventType());
-        holder.txt3.setText("ram");
+        holder.txt2.setText(list.get(position).getevent());
+
+
+        //holder.txt3.setText("ram");
+        //get the latitude and longitude of place or event happening
+        Double latitude = list.get(position).getLatitude();
+        Double longitude = list.get(position).getLongitude();
+
+        Geocoder geocoder = new Geocoder(holder.itemView.getContext(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            if (addresses != null && addresses.size() > 0) {
+                //to get only the city name which want for recycler view
+                Address address = addresses.get(0);
+                String city = address.getLocality(); // Get the city name
+                holder.txt3.setText(city != null ? city : "City not available");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
        holder.moreInfo.setOnClickListener(new View.OnClickListener() {
            @Override
            public void onClick(View v) {

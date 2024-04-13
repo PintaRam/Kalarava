@@ -473,6 +473,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
 
 
+
 //        BitmapDescriptor icon = BitmapDescriptorFactory.fromResource(markerDrawableId);
 //
 //        // Add a marker at the clicked location and customize it
@@ -487,7 +488,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 //        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
 
        //  Optionally, store marker details in Firebase Realtime Database
-        storeMarkerDetailsInFirebase(latLng,eventType,eventName,startDate,startTime,endDate,endTime,description);
+        storeMarkerDetailsInFirebase(markerDrawableId,latLng,eventType,eventName,startDate,startTime,endDate,endTime,description);
     }
 
 
@@ -495,13 +496,13 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
 
 
-    private void storeMarkerDetailsInFirebase(LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime,String description) {
+    private void storeMarkerDetailsInFirebase(int markerDrawableId,LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime,String description) {
         // Store marker details in Firebase Realtime Database
-        DatabaseReference markersRef = FirebaseDatabase.getInstance().getReference("Google markers");
+        DatabaseReference markersRef = FirebaseDatabase.getInstance().getReference("Pending");
         String markerId = markersRef.push().getKey();
 
         if (markerId != null) {
-            MarkerDetails markerDetails = new MarkerDetails(latLng.latitude, latLng.longitude, eventType, eventName, startDate, startTime, endDate, endTime, description);
+            MarkerDetails markerDetails = new MarkerDetails(markerDrawableId,latLng.latitude, latLng.longitude, eventType, eventName, startDate, startTime, endDate, endTime, description);
             markersRef.child(markerId).setValue(markerDetails);
         }
 //        Bundle bundle = new Bundle();

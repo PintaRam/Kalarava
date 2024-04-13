@@ -1,7 +1,7 @@
 package com.myapplication;
 
 public class MarkerDetails {
-    private String ename;
+    private String event;
     private double latitude;
     private double longitude;
     private String eventType;
@@ -10,6 +10,7 @@ public class MarkerDetails {
     private String startDate;
 
     private String endDate;
+    int markerDrawableId;
     private  String description;
 
 
@@ -17,8 +18,8 @@ public class MarkerDetails {
         // Default constructor required for Firebase
     }
 
-    public MarkerDetails(double latitude, double longitude, String eventType,String name, String startTime, String startDate,String endDate,String endTime,String description) {
-        this.ename=name;
+    public MarkerDetails(int markerDrawableId,double latitude, double longitude, String eventType,String event, String startDate, String startTime,String endDate,String endTime,String description) {
+        this.event=event;
         this.latitude = latitude;
         this.longitude = longitude;
         this.eventType = eventType;
@@ -27,22 +28,32 @@ public class MarkerDetails {
         this.startDate = endDate;
         this.endDate =endDate;
         this.description = description;
+        this.markerDrawableId = markerDrawableId;
     }
 
     public MarkerDetails( String eventType,String name, String startTime) {
-        this.ename=name;
+        this.event=name;
         this.eventType = eventType;
         this.startTime =startTime;
 
     }
-    public  String getevent()
-    {
-        return this.ename;
+
+    public int getMarkerDrawableId() {
+        return markerDrawableId;
     }
 
-    public void  setEventname(String name)
+    public void setMarkerDrawableId(int markerDrawableId) {
+        this.markerDrawableId = markerDrawableId;
+    }
+
+    public  String getevent()
     {
-        this.ename=name;
+        return event;
+    }
+
+    public void  setEventname(String event)
+    {
+        this.event=event;
     }
     public double getLatitude() {
         return latitude;

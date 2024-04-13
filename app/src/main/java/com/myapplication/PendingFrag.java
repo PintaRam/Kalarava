@@ -3,8 +3,15 @@ package com.myapplication;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
+import android.location.Address;
+import android.location.Geocoder;
 import android.os.Bundle;
 
+import com.google.android.gms.maps.CameraUpdateFactory;
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.MarkerOptions;
+import com.google.android.gms.maps.model.Marker;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.viewmodel.CreationExtras;
@@ -21,6 +28,8 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.model.BitmapDescriptor;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -28,15 +37,17 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 
 public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoClickListener {
-
+    private GoogleMap mMap;
     recyclerContact adapter;
     ArrayList<MarkerDetails> list;
-    TextView editText,editText1,editText3 , editText4,desedit,dateEditText;
+    TextView eventName,startDate,endDate ,startTime,description,endTime,eventType,location;
     TextView textView;
 
     // TODO: Rename parameter arguments, choose names that match
@@ -61,7 +72,7 @@ public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoC
         //  String refID ="kara";
 // rettrive the data from database
         // Read data
-        DatabaseReference reference = database.getReference().child("Google markers");
+        DatabaseReference reference = database.getReference().child("Pending");
 
 
         View view = inflater.inflate(R.layout.fragment_pending, container, false);
@@ -157,14 +168,62 @@ public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoC
         builder.setView(dialog);
 
         builder.setCancelable(false);
-//       editText = dialog.findViewById(R.id.editTextText);
-//        editText1 = dialog.findViewById(R.id.editTextText4);
-//        textView = dialog.findViewById(R.id.textView2);
-//        dateEditText = dialog.findViewById(R.id.editTextText2);
-//        editText3 = dialog.findViewById(R.id.editTextText8);
-//        editText4 = dialog.findViewById(R.id.editTextText9);
-        desedit = dialog.findViewById(R.id.editTextDescription);
-        desedit.setText(item.getDescription());
+
+        //finding the id of the dialog box
+       eventName = dialog.findViewById(R.id.editTextText);
+        endTime = dialog.findViewById(R.id.editTextText4);
+        eventType = dialog.findViewById(R.id.textView2);
+        startDate = dialog.findViewById(R.id.editTextText2);
+        endDate = dialog.findViewById(R.id.editTextText8);
+        startTime = dialog.findViewById(R.id.editTextText9);
+        description = dialog.findViewById(R.id.editTextDescription);
+        location =dialog.findViewById(R.id.location);
+
+        //getting latitide and location
+        Double latitude = item.getLatitude();
+        Double longitude = item.getLongitude();
+        String city = "Location Not found";
+        //finding place where the event is happening
+        Geocoder geocoder = new Geocoder(requireActivity(), Locale.getDefault());
+        try {
+            List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+            if (addresses != null && addresses.size() > 0) {
+                Address address = addresses.get(0);
+                city = address.getAddressLine(0);
+
+
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        //retriving the deatils from pending database
+        String eventType1 = item.getEventType();
+        String eventName1= item.getevent();
+        String startDate1 = item.getStartDate();
+        String startTime1 = item.getStartTime();
+        String endDate1 = item.getEndDate();
+        String endTime1 = item.getEndTime();
+        String description1 = item.getDescription();
+
+
+        //seting the text in dialog box
+
+        eventType.setText(item.getEventType());
+        eventName.setText(" Event : "+item.getevent());
+        startDate.setText(item.getStartDate());
+        endDate.setText(item.getEndDate());
+        startTime.setText(item.getStartTime());
+        endTime.setText(item.getEndTime());
+        description.setText(item.getDescription());
+        location.setText(city);
+        int markerDrawableId = item.getMarkerDrawableId();
+        LatLng latLng = new LatLng(latitude, longitude);
+        Log.d("ram","ram"+markerDrawableId);
+
+
+
 
         builder.setPositiveButton("Approve", null);
 
@@ -172,6 +231,14 @@ public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoC
         builder.setNegativeButton("Reject", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
+
+
+            storeMarkerDetailsInFirebaseRejected(markerDrawableId,latLng,eventType1,eventName1,startDate1,startTime1,endDate1,endTime1,description1);
+
+
+
+
+
                 dialogInterface.cancel();
             }
         });
@@ -186,7 +253,7 @@ public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoC
                     @Override
                     public void onClick(View v) {
 
-
+                        storeMarkerDetailsInFirebaseApproved(markerDrawableId,latLng,eventType1,eventName1,startDate1,startTime1,endDate1,endTime1,description1);
                         // Validate inputs
                         alertDialog.dismiss();
                     }
@@ -196,6 +263,39 @@ public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoC
 
 // Show the dialog
         alertDialog.show();
+
+
+    }
+
+    private void storeMarkerDetailsInFirebaseApproved(int markerDrawableId,LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime,String description) {
+        // Store marker details in Firebase Realtime Database
+        DatabaseReference markersRef = FirebaseDatabase.getInstance().getReference("Approved");
+        String markerId = markersRef.push().getKey();
+
+        if (markerId != null) {
+            MarkerDetails markerDetails = new MarkerDetails(markerDrawableId,latLng.latitude, latLng.longitude, eventType, eventName, startDate, startTime, endDate, endTime, description);
+            markersRef.child(markerId).setValue(markerDetails);
+        }
+//        Bundle bundle = new Bundle();
+//
+//        bundle.putString("eventName",eventName);
+
+
+
+    }
+    private void storeMarkerDetailsInFirebaseRejected(int markerDrawableId,LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime,String description) {
+        // Store marker details in Firebase Realtime Database
+        DatabaseReference markersRef = FirebaseDatabase.getInstance().getReference("Reject");
+        String markerId = markersRef.push().getKey();
+
+        if (markerId != null) {
+            MarkerDetails markerDetails = new MarkerDetails(markerDrawableId,latLng.latitude, latLng.longitude, eventType, eventName, startDate, startTime, endDate, endTime, description);
+            markersRef.child(markerId).setValue(markerDetails);
+        }
+//        Bundle bundle = new Bundle();
+//
+//        bundle.putString("eventName",eventName);
+
 
 
     }

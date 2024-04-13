@@ -27,14 +27,16 @@
 
     <TextView
         android:id="@+id/editTextText"
-        android:layout_width="347dp"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="52dp"
+        android:text="Krishna"
+        android:textSize="20sp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="25dp"
-        android:layout_marginTop="123dp"
-        android:layout_marginEnd="39dp"
+        android:layout_marginStart="36dp"
+        android:layout_marginTop="88dp"
+        android:layout_marginEnd="18dp"
         android:focusableInTouchMode="true"
         android:fontFamily="sans-serif"
         android:textColor="@color/white"
@@ -48,16 +50,16 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="24dp"
-        android:layout_marginTop="355dp"
-        android:layout_marginEnd="187dp"
+        android:layout_marginStart="45dp"
+        android:layout_marginTop="273dp"
+        android:layout_marginEnd="166dp"
         android:layout_marginBottom="40dp"
         android:focusableInTouchMode="true"
         android:fontFamily="sans-serif"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:textFontWeight="700"
-        android:textSize="15dp" />
+        android:textSize="18dp" />
 
     <TextView
         android:id="@+id/editTextText2"
@@ -66,15 +68,15 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="23dp"
-        android:layout_marginTop="224dp"
-        android:layout_marginEnd="178dp"
+        android:layout_marginStart="46dp"
+        android:layout_marginTop="193dp"
+        android:layout_marginEnd="154dp"
         android:layout_marginBottom="40dp"
         android:focusableInTouchMode="true"
         android:fontFamily="sans-serif"
-        android:textColorHint="@color/white"
+        android:textColor="@color/white"
         android:textFontWeight="700"
-        android:textSize="15dp" />
+        android:textSize="18dp" />
 
     <TextView
         android:id="@+id/editTextText4"
@@ -83,17 +85,17 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="191dp"
-        android:layout_marginTop="354dp"
-        android:layout_marginEnd="29dp"
+        android:layout_marginStart="195dp"
+        android:layout_marginTop="271dp"
+        android:layout_marginEnd="24dp"
         android:layout_marginBottom="40dp"
         android:focusableInTouchMode="true"
         android:fontFamily="sans-serif"
-        android:textSize="15dp"
         android:onClick="openTimePicker"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
-        android:textFontWeight="700" />
+        android:textFontWeight="700"
+        android:textSize="18dp" />
 
     <TextView
         android:id="@+id/editTextText9"
@@ -102,9 +104,9 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="173dp"
-        android:layout_marginTop="222dp"
-        android:layout_marginEnd="14dp"
+        android:layout_marginStart="177dp"
+        android:layout_marginTop="194dp"
+        android:layout_marginEnd="10dp"
         android:layout_marginBottom="40dp"
         android:focusableInTouchMode="true"
         android:fontFamily="sans-serif"
@@ -112,46 +114,50 @@
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:textFontWeight="700"
-        android:textSize="15dp"
+        android:textSize="18dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.972"
         app:layout_constraintStart_toStartOf="parent" />
 
     <TextView
         android:id="@+id/decription"
-        android:layout_width="372dp"
-        android:layout_height="59dp"
-        android:paddingTop="10dp"
+        android:layout_width="wrap_content"
+        android:layout_height="76dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="19dp"
-        android:layout_marginTop="417dp"
-        android:layout_marginEnd="18dp"
+        android:layout_marginStart="31dp"
+        android:layout_marginTop="436dp"
+        android:layout_marginEnd="158dp"
         android:focusableInTouchMode="true"
         android:fontFamily="sans-serif"
+        android:paddingTop="10dp"
         android:text="Description"
         android:textAlignment="center"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
         android:textFontWeight="700"
-        android:textSize="25sp" />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/editTextDescription"
-        android:layout_width="372dp"
-        android:layout_height="59dp"
+        android:layout_width="wrap_content"
+        android:layout_height="87dp"
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="21dp"
-        android:layout_marginTop="479dp"
-        android:layout_marginEnd="17dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="478dp"
+        android:layout_marginEnd="30dp"
         android:focusableInTouchMode="true"
         android:fontFamily="sans-serif"
+        android:paddingLeft="10dp"
+        android:paddingTop="10dp"
+        android:text="Krishna"
         android:textColor="@color/white"
         android:textColorHint="@color/white"
-        android:textFontWeight="700" />
+        android:textFontWeight="700"
+        android:textSize="18sp" />
 
     <TextView
         android:id="@+id/textView4"
@@ -160,13 +166,15 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="30dp"
-        android:layout_marginTop="167dp"
-        android:layout_marginEnd="146dp"
+        android:layout_marginStart="20dp"
+        android:layout_marginTop="138dp"
+        android:layout_marginEnd="156dp"
+        android:paddingLeft="10dp"
         android:paddingTop="10dp"
         android:text="From"
         android:textColor="@color/white"
-        android:textSize="20sp" />
+        android:textSize="22sp"
+        android:textStyle="bold"/>
 
     <TextView
         android:id="@+id/textView2"
@@ -175,15 +183,14 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="84dp"
-        android:layout_marginTop="58dp"
-        android:layout_marginEnd="92dp"
+        android:layout_marginStart="91dp"
+        android:layout_marginTop="33dp"
+        android:layout_marginEnd="85dp"
         android:paddingTop="10dp"
         android:text="Hospital"
         android:textAlignment="center"
         android:textColor="@color/white"
-        android:textSize="20sp"
-        />
+        android:textSize="20sp" />
 
     <TextView
         android:id="@+id/textView7"
@@ -192,13 +199,40 @@
         android:layout_alignParentStart="true"
         android:layout_alignParentTop="true"
         android:layout_alignParentEnd="true"
-        android:layout_marginStart="23dp"
-        android:layout_marginTop="289dp"
-        android:layout_marginEnd="142dp"
+        android:layout_marginStart="31dp"
+        android:layout_marginTop="228dp"
+        android:layout_marginEnd="134dp"
         android:paddingTop="10dp"
         android:text="To"
         android:textColor="@color/white"
+        android:textSize="22sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:id="@+id/location"
+        android:layout_width="361dp"
+        android:layout_height="78dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginStart="47dp"
+        android:layout_marginTop="334dp"
+        android:layout_marginEnd="3dp"
+        android:paddingLeft="20dp"
+        android:paddingTop="5dp"
+        android:text="Location"
+        android:textColor="@color/white"
         android:textSize="20sp" />
+
+    <ImageView
+        android:id="@+id/imageView3"
+        android:layout_width="wrap_content"
+        android:layout_height="61dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:layout_marginStart="4dp"
+        android:layout_marginTop="343dp"
+        app:srcCompat="@drawable/user" />
 
 
 </RelativeLayout>

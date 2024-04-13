@@ -137,7 +137,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private  void getOnGoingEvents()
     {
         //Marking Hosted Events in Gmap
-        DatabaseReference eventsRef = FirebaseDatabase.getInstance().getReference("Google markers");
+        DatabaseReference eventsRef = FirebaseDatabase.getInstance().getReference("Approved");
         eventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
