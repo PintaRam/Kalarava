@@ -2,6 +2,7 @@ package com.myapplication;
 
 import android.Manifest;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -13,8 +14,14 @@ import android.location.LocationManager;
 import android.media.audiofx.Virtualizer;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
+import android.util.Log;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.widget.Button;
 import android.widget.SearchView;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
@@ -30,6 +37,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -50,12 +58,16 @@ import com.myapplication.databinding.ActivityMapsBinding;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.Locale;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback {
     private GoogleMap mMap;
+    MarkerDetails event;
+    TextView eventName,startDate,endDate ,startTime,description,endTime,eventType,location;
     private ActivityMapsBinding binding;
     boolean ispermitted=false;
     Location currlocation;
+    String city = "Location Not found";
     FusedLocationProviderClient clientLocation;
     private final int ACCESS_FINE_CODE = 1;
     final int PERMISSION_REQUEST_CODE=1001;
@@ -129,6 +141,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap = googleMap;
         getlocation();
         getOnGoingEvents();
+
+
         //search_loc();
     }
 
@@ -136,8 +150,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private  void getOnGoingEvents()
     {
+
         //Marking Hosted Events in Gmap
-        DatabaseReference eventsRef = FirebaseDatabase.getInstance().getReference("Google markers");
+        DatabaseReference eventsRef = FirebaseDatabase.getInstance().getReference("Approved");
         eventsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -150,6 +165,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     double longitude = event.getLongitude();
                     String description = event.getDescription();
                     String type=event.getEventType();
+                    String eventName = event.getevent();
+                    String startDate = event.getStartDate();
+                    String startTime =event.getStartTime();
+                    String endTime = event.getEndTime();
+                    String endDate = event.getEndDate();
+
 
                     // Add marker for each event on the map
 
@@ -171,11 +192,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     } else if ("Parking".equals(type)) {
                         which_marker = R.drawable.parking;
                     }
+
+                    //finding place where the event is happening
+                    Geocoder geocoder = new Geocoder(MapsActivity.this, Locale.getDefault());
+                    try {
+                        List<Address> addresses = geocoder.getFromLocation(latitude, longitude, 1);
+                        if (addresses != null && addresses.size() > 0) {
+                            Address address = addresses.get(0);
+                            city = address.getAddressLine(0);
+
+
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     mMap.addMarker(new MarkerOptions()
                             .position(eventLocation)
-                            .title(title)
-                            .snippet(description)
+                            .title(event.getEventType())
+                            .snippet("Event Name : "+eventName+", \nDate: " + startDate+" ,End Date : " +endDate+", \nTime: " + startTime  +" ,EndTime : "+endTime+", \nDescription : "+description +", \nLocation : "+city)
                             .icon(BitmapDescriptorFactory.fromResource(which_marker))); // You can customize the marker icon as needed
+
+                    // Inside your method where you add markers to the map (e.g., getOnGoingEvents method)
+                    mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+                        @Override
+                        public void onInfoWindowClick(Marker marker) {
+                            // Show the dialog when the info window of the marker is clicked
+                            showDialogForMarker(marker);
+                        }
+                    });
+
+
                 }
             }
 
@@ -185,6 +231,26 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Toast.makeText(MapsActivity.this, "Failed to retrieve events: " + databaseError.getMessage(), Toast.LENGTH_SHORT).show();
             }
         });
+
+
+    }
+    private void showDialogForMarker(Marker marker) {
+        // Retrieve the relevant information from the marker
+        String title = marker.getTitle();
+        String snippet = marker.getSnippet();
+
+        // Create and show a dialog with the marker information
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle(title)
+                .setMessage(snippet)
+                .setPositiveButton("OK", null) // Add your dialog buttons or functionality here
+                .show();
+    }
+
+
+    public static boolean isGPSEnabled(Context context) {
+        LocationManager locationManager = (LocationManager) context.getSystemService(Context.LOCATION_SERVICE);
+        return locationManager != null && locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
     }
 
     private void getlocation() {
@@ -192,8 +258,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
         } else {
-            // Location permission granted
-            showLocationTurnDialog();
+            if (!MapsActivity.isGPSEnabled(this)) {
+                // Location permission granted
+                showLocationTurnDialog();
+            }
             // Get user's last known location
             clientLocation.getLastLocation().addOnSuccessListener(this, new OnSuccessListener<Location>() {
                 @Override
@@ -241,4 +309,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         AlertDialog alert = builder.create();
         alert.show();
     }
+
+
 }

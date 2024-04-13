@@ -4,6 +4,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.recyclerview.widget.RecyclerView;
+import androidx.viewpager.widget.ViewPager;
 
 import android.Manifest;
 import android.app.AlertDialog;
@@ -13,23 +15,44 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
+import android.media.Image;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.View;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.material.tabs.TabLayout;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.Query;
+import com.google.firebase.database.ValueEventListener;
 
 public class AdminsView extends AppCompatActivity {
-
+    RecyclerView recyclerView ;
+    //recyclerContact adapter ;
     final int PERMISSION_REQUEST_CODE=1001;
+    TabLayout tabLayout;
+    ViewPager viewPager;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_admins_view);
         //Request for location access
+
+        tabLayout = findViewById(R.id.tabellayot);
+        viewPager = findViewById(R.id.viewpage);
+        pageViewerJava adapter = new pageViewerJava(getSupportFragmentManager());
+        viewPager.setAdapter(adapter);
+        tabLayout.setupWithViewPager(viewPager);
+
 
         get_my_loc();
 
@@ -62,10 +85,12 @@ public class AdminsView extends AppCompatActivity {
     {
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, PERMISSION_REQUEST_CODE);
+        } else {
+            if (!MapsActivity.isGPSEnabled(this)) {
+                // Location permission granted
+                showLocationTurnDialog();
+            }
         }
-
-
-        showLocationTurnDialog();
 
         // Inside onCreate() method, after checking location settings
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
@@ -90,5 +115,9 @@ public class AdminsView extends AppCompatActivity {
                 Toast.makeText(AdminsView.this, "Location retrieval failed", Toast.LENGTH_SHORT).show();
             }
         });
+
     }
+
+    // Method to update the marker with new details
+
 }
