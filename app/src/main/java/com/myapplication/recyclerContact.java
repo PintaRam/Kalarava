@@ -22,16 +22,18 @@ import android.content.Context;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.google.firebase.database.FirebaseDatabase;
+
 import java.util.ArrayList;
 
 public class recyclerContact extends RecyclerView.Adapter<recyclerContact.viewholder> {
-    // Context context;
+    Context context;
     ArrayList<MarkerDetails>list;
     private OnMoreInfoClickListener listener;
 
     recyclerContact(Context context, ArrayList<MarkerDetails>list,OnMoreInfoClickListener listener)
     {
-        //this.context = context;
+        this.context = context;
         this.list = list;
         this.listener = listener;
 

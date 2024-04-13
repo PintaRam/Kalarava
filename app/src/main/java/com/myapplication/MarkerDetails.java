@@ -1,5 +1,7 @@
 package com.myapplication;
 
+import com.google.firebase.database.FirebaseDatabase;
+
 public class MarkerDetails {
     private String event;
     private double latitude;
@@ -10,7 +12,7 @@ public class MarkerDetails {
     private String startDate;
 
     private String endDate;
-    int markerDrawableId;
+    String markerDrawableId;
     private  String description;
 
 
@@ -18,7 +20,7 @@ public class MarkerDetails {
         // Default constructor required for Firebase
     }
 
-    public MarkerDetails(int markerDrawableId,double latitude, double longitude, String eventType,String event, String startDate, String startTime,String endDate,String endTime,String description) {
+    public MarkerDetails(String markerDrawableId,double latitude, double longitude, String eventType,String event, String startDate, String startTime,String endDate,String endTime,String description) {
         this.event=event;
         this.latitude = latitude;
         this.longitude = longitude;
@@ -38,11 +40,11 @@ public class MarkerDetails {
 
     }
 
-    public int getMarkerDrawableId() {
+    public String getMarkerDrawableId() {
         return markerDrawableId;
     }
 
-    public void setMarkerDrawableId(int markerDrawableId) {
+    public void setMarkerDrawableId(String markerDrawableId) {
         this.markerDrawableId = markerDrawableId;
     }
 
@@ -118,6 +120,7 @@ public class MarkerDetails {
     public void setDescription(String description) {
         this.description = description;
     }
+
 
 
 }

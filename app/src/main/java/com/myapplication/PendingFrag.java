@@ -2,7 +2,9 @@ package com.myapplication;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.ProgressDialog;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.location.Address;
 import android.location.Geocoder;
 import android.os.Bundle;
@@ -18,6 +20,7 @@ import androidx.lifecycle.viewmodel.CreationExtras;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.os.Handler;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -30,6 +33,10 @@ import android.widget.Toast;
 
 import com.google.android.gms.maps.model.BitmapDescriptor;
 import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -44,8 +51,14 @@ import java.util.Locale;
 
 
 public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoClickListener {
-    private GoogleMap mMap;
+
     recyclerContact adapter;
+    ProgressDialog progressDialog;
+FirebaseDatabase database;
+DatabaseReference reference;
+View view;
+
+FirebaseAuth auth;
     ArrayList<MarkerDetails> list;
     TextView eventName,startDate,endDate ,startTime,description,endTime,eventType,location;
     TextView textView;
@@ -65,73 +78,13 @@ public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoC
 
 
         // Initialize Firebase
-        FirebaseDatabase database = FirebaseDatabase.getInstance();
+        database = FirebaseDatabase.getInstance();
+        reference = database.getReference().child("Pending");
+        view = inflater.inflate(R.layout.fragment_pending, container, false);
 
-        // Reference to your data
-        // DatabaseReference myRef = database.getReference().child("Google markers");//.child(firebaseAuth.getUid());
-        //  String refID ="kara";
-// rettrive the data from database
-        // Read data
-        DatabaseReference reference = database.getReference().child("Pending");
-
-
-        View view = inflater.inflate(R.layout.fragment_pending, container, false);
-       list = new ArrayList<>();
-        RecyclerView recyclerView = view.findViewById(R.id.recycle);
-        recyclerView.setHasFixedSize(true);
-
-        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
-        adapter = new recyclerContact(getActivity(),list,this);
-        recyclerView.setAdapter(adapter);
-
-// Set the adapter
-
-//        list.add(new MarkerDetails("Conference", "Conference Name", "Location 2"));
-//        list.add(new MarkerDetails("Conference", "Conference Name", "Location 2"));
-//        list.add(new MarkerDetails("Conference", "Conference Name", "Location 2"));
-//        list.add(new MarkerDetails("Conference", "Conference Name", "Location 2"));
-//        list.add(new MarkerDetails("Conference", "Conference Name", "Location 2"));
-
-        //recyclerView.setAdapter(new recyclerContact(getContext(), list));
-        // Inflate the layout for this fragment\
-
-
-        //database work
-
-        reference.addValueEventListener(new ValueEventListener() {
-            @Override
-            public void onDataChange(DataSnapshot dataSnapshot) {
-                // This method is called once with the initial value and whenever data at this location is updated.
-                //  MarkerDetails model = dataSnapshot.getValue(MarkerDetails.class);
-//////////////////////adding the data from database to list
-                for (DataSnapshot Snapshot: dataSnapshot.getChildren())
-                {
-                    MarkerDetails eventDetails = Snapshot.getValue(MarkerDetails.class);
-                    list.add(eventDetails);
-                }
-                adapter.notifyDataSetChanged();
-
-            }
-
-            @Override
-            public void onCancelled(DatabaseError error) {
-                // Failed to read value
-                //System.out.println("Failed to read value." + error.toException());
-                Log.d("event","Failed to retrive the data");
-            }
-        });
-
-
-
-
-
-
-
-
-
+        databaseworkAdapterwork(view,reference,database);
         return view;
-        // Inflate the layout for this fragment
-        // return inflater.inflate(R.layout.fragment_pending, container, false);
+
     }
 
     @NonNull
@@ -143,24 +96,15 @@ public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoC
     @Override
     public void onMoreInfoClicked(int position) {
         Log.d("ram","showdialog");
+        Log.d("ram","showdialog"+position);
         MarkerDetails item = list.get(position);
-        showDialog(item);
+        Log.d("ram","showdialog"+item);
+
+        showDialog(item,position);
 
     }
 
-
-    //private List<contact> initData() {
-//        list = new ArrayList<>();
-//        list.add(new contact("Conference", "Conference Name", "Location 2"));
-//        list.add(new contact("Conference", "Conference Name", "Location 2"));
-//        list.add(new contact("Conference", "Conference Name", "Location 2"));
-//        list.add(new contact("Conference", "Conference Name", "Location 2"));
-//        list.add(new contact("Conference", "Conference Name", "Location 2"));
-//        list.add(new contact("Conference", "Conference Name", "Location 2"));
-  //    return list;
-
-    //}
-    public void showDialog(MarkerDetails item)
+    public void showDialog(MarkerDetails item,int position)
     {
         AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
         LayoutInflater inflater = requireActivity().getLayoutInflater();
@@ -216,11 +160,10 @@ public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoC
         endDate.setText(item.getEndDate());
         startTime.setText(item.getStartTime());
         endTime.setText(item.getEndTime());
+        String markerID = item.getMarkerDrawableId();
         description.setText(item.getDescription());
         location.setText(city);
-        int markerDrawableId = item.getMarkerDrawableId();
         LatLng latLng = new LatLng(latitude, longitude);
-        Log.d("ram","ram"+markerDrawableId);
 
 
 
@@ -232,14 +175,69 @@ public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoC
             @Override
             public void onClick(DialogInterface dialogInterface, int i) {
 
+                try {
+                    if (markerID != null) {
+                        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                                .setTitle("Reject Request for " + eventName1)
+                                .setMessage("Do You Want to Reject this Event for sure")
+                                .setIcon(R.drawable.reject)
+                                .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+                                        // Delete marker from Firebase
+                                        deleteMarkerFromFirebase(markerID);
+                                        // Show progress dialog
+                                        progressDialog = ProgressDialog.show(getActivity(), "Setting Up", "Please wait...", false);
 
-            storeMarkerDetailsInFirebaseRejected(markerDrawableId,latLng,eventType1,eventName1,startDate1,startTime1,endDate1,endTime1,description1);
+
+
+                                        // Dismiss the dialog after a delay
+                                        new Handler().postDelayed(new Runnable() {
+                                            @Override
+                                            public void run() {
+                                                // Dismiss the progress dialog
+                                                if (progressDialog != null && progressDialog.isShowing()) {
+                                                    progressDialog.dismiss();
+                                                }
+                                                Log.d("ram","krishna");
+                                                dialogInterface.cancel();
+
+                                                // Update RecyclerView
+                                                databaseworkAdapterwork(view, reference, database);
+                                            }
+                                        }, 20000);
+
+
+                                        // Dismiss the approval dialog
+
+                                        storeMarkerDetailsInFirebaseRejected(latLng, eventType1, eventName1, startDate1, startTime1, endDate1, endTime1, description1);
+//                                                list.remove(position);
+//                                                adapter.notifyItemChanged(position);
+
+
+
+                                    }
+                                })
+                                .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                    @Override
+                                    public void onClick(DialogInterface dialog, int which) {
+
+                                    }
+                                });
+
+
+                        builder.show();
+                    }else {
+                        Log.d("ram","exception");
+                    }
+                }catch (Exception e)
+                {
+                    e.printStackTrace();
+                }
 
 
 
 
-
-                dialogInterface.cancel();
             }
         });
 
@@ -253,9 +251,70 @@ public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoC
                     @Override
                     public void onClick(View v) {
 
-                        storeMarkerDetailsInFirebaseApproved(markerDrawableId,latLng,eventType1,eventName1,startDate1,startTime1,endDate1,endTime1,description1);
+
                         // Validate inputs
-                        alertDialog.dismiss();
+
+                        try {
+                            if (markerID != null) {
+                                AlertDialog.Builder builder = new AlertDialog.Builder(getActivity())
+                                        .setTitle("Approve Request for " + eventName1)
+                                        .setMessage("Do You Want to Approve  this for sure" )
+                                        .setIcon(R.drawable.apprived)
+                                        .setPositiveButton("yes", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+                                                // Delete marker from Firebase
+                                                deleteMarkerFromFirebase(markerID);
+                                                alertDialog.dismiss();
+                                                // Show progress dialog
+                                                progressDialog = ProgressDialog.show(getActivity(), "Setting Up", "Please wait...", false);
+
+
+
+                                                // Dismiss the dialog after a delay
+                                                new Handler().postDelayed(new Runnable() {
+                                                    @Override
+                                                    public void run() {
+                                                        // Dismiss the progress dialog
+                                                        if (progressDialog != null && progressDialog.isShowing()) {
+                                                            progressDialog.dismiss();
+                                                        }
+                                                        Log.d("ram","krishna");
+
+
+                                                        // Update RecyclerView
+                                                        databaseworkAdapterwork(view, reference, database);
+                                                    }
+                                                }, 20000);
+
+
+                                                // Dismiss the approval dialog
+
+                                                storeMarkerDetailsInFirebaseApproved(latLng, eventType1, eventName1, startDate1, startTime1, endDate1, endTime1, description1);
+//                                                list.remove(position);
+//                                                adapter.notifyItemChanged(position);
+
+
+
+                                            }
+                                        })
+                                        .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                                            @Override
+                                            public void onClick(DialogInterface dialog, int which) {
+
+                                            }
+                                        });
+
+
+                                builder.show();
+                            }else {
+                                Log.d("ram","exception");
+                            }
+                        }catch (Exception e)
+                        {
+                            e.printStackTrace();
+                        }
+
                     }
                 });
             }
@@ -267,15 +326,16 @@ public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoC
 
     }
 
-    private void storeMarkerDetailsInFirebaseApproved(int markerDrawableId,LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime,String description) {
+    private void storeMarkerDetailsInFirebaseApproved(LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime,String description) {
         // Store marker details in Firebase Realtime Database
         DatabaseReference markersRef = FirebaseDatabase.getInstance().getReference("Approved");
         String markerId = markersRef.push().getKey();
 
         if (markerId != null) {
-            MarkerDetails markerDetails = new MarkerDetails(markerDrawableId,latLng.latitude, latLng.longitude, eventType, eventName, startDate, startTime, endDate, endTime, description);
+            MarkerDetails markerDetails = new MarkerDetails(markerId,latLng.latitude, latLng.longitude, eventType, eventName, startDate, startTime, endDate, endTime, description);
             markersRef.child(markerId).setValue(markerDetails);
         }
+
 //        Bundle bundle = new Bundle();
 //
 //        bundle.putString("eventName",eventName);
@@ -283,15 +343,19 @@ public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoC
 
 
     }
-    private void storeMarkerDetailsInFirebaseRejected(int markerDrawableId,LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime,String description) {
+    private void storeMarkerDetailsInFirebaseRejected(LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime,String description) {
         // Store marker details in Firebase Realtime Database
         DatabaseReference markersRef = FirebaseDatabase.getInstance().getReference("Reject");
         String markerId = markersRef.push().getKey();
 
         if (markerId != null) {
-            MarkerDetails markerDetails = new MarkerDetails(markerDrawableId,latLng.latitude, latLng.longitude, eventType, eventName, startDate, startTime, endDate, endTime, description);
+            MarkerDetails markerDetails = new MarkerDetails(markerId,latLng.latitude, latLng.longitude, eventType, eventName, startDate, startTime, endDate, endTime, description);
             markersRef.child(markerId).setValue(markerDetails);
         }
+
+
+
+
 //        Bundle bundle = new Bundle();
 //
 //        bundle.putString("eventName",eventName);
@@ -299,4 +363,65 @@ public class PendingFrag extends Fragment implements recyclerContact.OnMoreInfoC
 
 
     }
+    private void deleteMarkerFromFirebase(String markerId) {
+        // Get reference to the marker in Firebase Realtime Database
+        DatabaseReference markerRef = FirebaseDatabase.getInstance().getReference("Pending").child(markerId);
+
+        // Delete the marker from Firebase
+        markerRef.removeValue().addOnCompleteListener(new OnCompleteListener<Void>() {
+            @Override
+            public void onComplete(@NonNull Task<Void> task) {
+                if (task.isSuccessful()) {
+                    // Marker deleted successfully from Firebase
+                   // Toast.makeText(getActivity(), "Marker deleted successfully from Firebase", Toast.LENGTH_SHORT).show();
+                } else {
+                    // Handle failure to delete marker from Firebase
+                  //  Toast.makeText(getActivity(), "Failed to delete marker from Firebase", Toast.LENGTH_SHORT).show();
+                }
+            }
+        });
+    }
+
+
+    public void databaseworkAdapterwork(View view , DatabaseReference reference , FirebaseDatabase database)
+    {
+        list = new ArrayList<>();
+        RecyclerView recyclerView = view.findViewById(R.id.recycle);
+        recyclerView.setHasFixedSize(true);
+
+        recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
+        adapter = new recyclerContact(getActivity(),list,this);
+        recyclerView.setAdapter(adapter);
+
+
+        //database work
+
+        reference.addValueEventListener(new ValueEventListener() {
+            @Override
+            public void onDataChange(DataSnapshot dataSnapshot) {
+                // This method is called once with the initial value and whenever data at this location is updated.
+                //  MarkerDetails model = dataSnapshot.getValue(MarkerDetails.class);
+//////////////////////adding the data from database to list
+                for (DataSnapshot Snapshot: dataSnapshot.getChildren())
+                {
+                    MarkerDetails eventDetails = Snapshot.getValue(MarkerDetails.class);
+                    list.add(eventDetails);
+                }
+                adapter.notifyDataSetChanged();
+
+            }
+
+            @Override
+            public void onCancelled(DatabaseError error) {
+                // Failed to read value
+                //System.out.println("Failed to read value." + error.toException());
+                Log.d("event","Failed to retrive the data");
+            }
+        });
+
+
+
+
+    }
+
 }

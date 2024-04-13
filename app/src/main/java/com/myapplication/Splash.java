@@ -14,6 +14,7 @@ public class Splash extends AppCompatActivity {
 
     Animation Spin,top,bottom;
     ImageView spImg;
+
     TextView sptext;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,7 +34,7 @@ public class Splash extends AppCompatActivity {
             @Override
             public void run() {
 
-                Intent intent=new Intent(Splash.this, MapsActivity.class);
+                Intent intent=new Intent(Splash.this,MapsActivity.class);
                 startActivity(intent);
                 finish();
 

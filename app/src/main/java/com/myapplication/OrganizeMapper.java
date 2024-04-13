@@ -36,6 +36,8 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.google.android.gms.maps.model.Marker;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
@@ -488,7 +490,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 //        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
 
        //  Optionally, store marker details in Firebase Realtime Database
-        storeMarkerDetailsInFirebase(markerDrawableId,latLng,eventType,eventName,startDate,startTime,endDate,endTime,description);
+        storeMarkerDetailsInFirebase(latLng,eventType,eventName,startDate,startTime,endDate,endTime,description);
     }
 
 
@@ -496,13 +498,13 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
 
 
-    private void storeMarkerDetailsInFirebase(int markerDrawableId,LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime,String description) {
+    private void storeMarkerDetailsInFirebase(LatLng latLng,String eventType,String eventName,String startDate,String startTime,String endDate,String endTime,String description) {
         // Store marker details in Firebase Realtime Database
         DatabaseReference markersRef = FirebaseDatabase.getInstance().getReference("Pending");
         String markerId = markersRef.push().getKey();
 
         if (markerId != null) {
-            MarkerDetails markerDetails = new MarkerDetails(markerDrawableId,latLng.latitude, latLng.longitude, eventType, eventName, startDate, startTime, endDate, endTime, description);
+            MarkerDetails markerDetails = new MarkerDetails(markerId,latLng.latitude, latLng.longitude, eventType, eventName, startDate, startTime, endDate, endTime, description);
             markersRef.child(markerId).setValue(markerDetails);
         }
 //        Bundle bundle = new Bundle();
@@ -558,4 +560,5 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
+
 }
