@@ -65,7 +65,7 @@ public class RejectFrag extends Fragment implements  recyclerContact.OnMoreInfoC
         // Reference to your data
         // DatabaseReference myRef = database.getReference().child("Google markers");//.child(firebaseAuth.getUid());
         //  String refID ="kara";
-// rettrive the data from database
+        // rettrive the data from database
         // Read data
         DatabaseReference reference = database.getReference().child("Reject");
 

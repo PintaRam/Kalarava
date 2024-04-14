@@ -2,16 +2,22 @@ package com.myapplication;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.biometric.BiometricPrompt;
 
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.os.Handler;
+import android.text.TextUtils;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.Toast;
 import  android.widget.ArrayAdapter;
@@ -29,7 +35,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class Register extends AppCompatActivity implements AdapterView.OnItemSelectedListener {
 
-     final String[] roles= {"Null","Admin","Guest","Organiser"};
+    final String[] roles= {"Null","Admin","Guest","Organiser"};
     Button register,signIn;
     Spinner spin1;
     String Role = "";
@@ -39,6 +45,8 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
     //FirebaseAuth myAuth;
     DatabaseReference Dbrefer;
     FirebaseAuth myauth;
+    EditText key, passwordadmin;
+    Button submit, cancel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -156,6 +164,7 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
             switch (Role)
             {
                 case "Admin":
+
                     Dbrefer=fireDb.getReference("Admin"); //Creating Database Refernces
                     Dbrefer.orderByChild("mail").equalTo(email).addListenerForSingleValueEvent(new ValueEventListener() {
                         @Override
@@ -165,7 +174,7 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
                                 Toast.makeText(Register.this, "Admin Email already registered. Please use a different email.", Toast.LENGTH_SHORT).show();
                             } else {
                                 // Email does not exist in the database, proceed with registration
-                              addAdminDetails(name,user);
+                                dialog(name, user);
                             }
                         }
 
@@ -230,6 +239,7 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
 
     private void addAdminDetails(String name,Users user)
     {
+
         Dbrefer.child(name).setValue(user).addOnCompleteListener(new OnCompleteListener<Void>() {
             @Override
             public void onComplete(@NonNull Task<Void> task) {
@@ -295,4 +305,74 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
     public void onNothingSelected(AdapterView<?> parent) {
 
     }
+
+    public void dialog(String name , Users user)
+    {
+        AlertDialog.Builder builder = new AlertDialog.Builder(Register.this);
+        LayoutInflater inflater = this.getLayoutInflater();
+        View dialog = inflater.inflate(R.layout.cust_dialog, null);
+        builder.setView(dialog);
+        builder.setCancelable(false);
+
+// Initialize Views
+        key =dialog.findViewById(R.id.security);
+        passwordadmin = dialog.findViewById(R.id.admin);
+
+
+
+
+// Set positive button click listener
+        builder.setPositiveButton("confirm", null);
+
+// Set negative button click listener
+        builder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialogInterface, int i) {
+                dialogInterface.cancel();
+            }
+        });
+
+// Create the AlertDialog
+        final AlertDialog alertDialog = builder.create();
+        alertDialog.setOnShowListener(new DialogInterface.OnShowListener() {
+            @Override
+            public void onShow(DialogInterface dialog) {
+                Button buttonPositive = alertDialog.getButton(DialogInterface.BUTTON_POSITIVE);
+                buttonPositive.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        String securitykey = key.getText().toString();
+                        String passadmin = passwordadmin.getText().toString();
+
+                        if(TextUtils.isEmpty(securitykey))
+                        {
+                            key.setError("Please Enter Security Key");
+                            Toast.makeText(Register.this, "Please Enter Security Key", Toast.LENGTH_SHORT).show();
+                        }
+                        else if (TextUtils.isEmpty(passadmin))
+                        {
+                            passwordadmin.setError("please Enter Admin Password");
+                            Toast.makeText(Register.this, "please Enter Admin password", Toast.LENGTH_SHORT).show();
+                        }else if(!securitykey.trim().equals("Ram@369") || !passadmin.trim().equals("admin@123"))
+                        {
+                            key.setError("Please Enter Correct Key");
+
+                            passwordadmin.setError("Please Enter the Correct Password");
+                            Toast.makeText(Register.this, "Please Enter the Correct Cardentials for Admin Register", Toast.LENGTH_SHORT).show();
+                        } else {
+                            addAdminDetails(name,user);
+                            alertDialog.dismiss();
+
+                        }
+
+
+                    }
+                });
+            }
+        });
+        alertDialog.show();
+    }
+
+
+
 }
