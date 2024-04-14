@@ -210,8 +210,7 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
                                 // Email does not exist in the database, proceed with registration
 
                                 addOrganiserDetails(name,user);
-                                Intent intent = new Intent(Register.this,OrganizeMapper.class);
-                                startActivity(intent);
+
                             }
                         }
 
