@@ -239,8 +239,8 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
                     @Override
                     public void run() {
                         Toast.makeText(Register.this,"Registration Successfull !!!!",Toast.LENGTH_LONG).show();
-                        //Intent i=new Intent(Register.this,Login.class);
-                       // startActivity(i);
+                        Intent i=new Intent(Register.this,Login.class);
+                        startActivity(i);
                     }
                 },10000 );
 
