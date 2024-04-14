@@ -17,20 +17,35 @@
         tools:context=".MapsActivity" />
 
 
-    <SearchView
+    <EditText
+
         android:id="@+id/searchView"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:queryHint="Search"
-        android:background="@color/white"
-        android:defaultFocusHighlightEnabled="true"
-        android:elevation="5dp"
-        android:iconifiedByDefault="false"
-        android:layout_margin="10dp"
+        android:layout_width="256dp"
+        android:layout_height="58dp"
+        android:background="@drawable/backg"
+        android:ems="10"
+        android:hint="Search for a Place..."
+        android:inputType="text"
+        android:paddingLeft="10dp"
+        android:textSize="20sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintHorizontal_bias="0.238"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/map"
-        app:layout_constraintVertical_bias="0.018" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.023" />
+
+    <ImageView
+        android:id="@+id/imageView"
+        android:layout_width="98dp"
+        android:layout_height="57dp"
+        android:background="@drawable/backg"
+        android:src="@android:drawable/ic_menu_search"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.948"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.025" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>

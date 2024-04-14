@@ -14,6 +14,7 @@ import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.Dialog;
+import android.app.ProgressDialog;
 import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -27,10 +28,12 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.os.Handler;
 import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -488,7 +491,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 //
 //        // Optionally, you can move the camera to the clicked location
 //        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, 15));
-
+        showDialog(eventType);
        //  Optionally, store marker details in Firebase Realtime Database
         storeMarkerDetailsInFirebase(latLng,eventType,eventName,startDate,startTime,endDate,endTime,description);
     }
@@ -560,5 +563,22 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
 
         return BitmapDescriptorFactory.fromBitmap(bitmap);
     }
+    public void showDialog(String eventType)
+    {
+
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Success")
+                .setIcon(R.drawable.success)
+                .setMessage("Congratulation, Your "+eventType+" event has successfully registered please Wait for the Admin Approval\nYou will be notified about Your event once approved")
+                .setPositiveButton("OK", null) // Add your dialog buttons or functionality here
+                .show();
+
+
+
+                builder.show();
+            }
+
+
 
 }

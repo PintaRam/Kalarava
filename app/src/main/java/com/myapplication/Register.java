@@ -32,7 +32,7 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
      final String[] roles= {"Null","Admin","Guest","Organiser"};
     Button register,signIn;
     Spinner spin1;
-    String Role;
+    String Role = "";
     TextInputLayout Uname,Umail,Upassword,Uconfirmpswd,Umob;
     Spinner role;
     FirebaseDatabase fireDb;
@@ -210,8 +210,7 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
                                 // Email does not exist in the database, proceed with registration
 
                                 addOrganiserDetails(name,user);
-                                Intent intent = new Intent(Register.this,OrganizeMapper.class);
-                                startActivity(intent);
+
                             }
                         }
 
@@ -239,8 +238,8 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
                     @Override
                     public void run() {
                         Toast.makeText(Register.this,"Registration Successfull !!!!",Toast.LENGTH_LONG).show();
-                        //Intent i=new Intent(Register.this,Login.class);
-                       // startActivity(i);
+                        Intent i=new Intent(Register.this,Login.class);
+                        startActivity(i);
                     }
                 },10000 );
 
@@ -289,7 +288,7 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+        Role=roles[position];
     }
 
     @Override

@@ -20,6 +20,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.SearchView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,6 +59,7 @@ import com.karumi.dexter.listener.single.PermissionListener;
 import com.myapplication.databinding.ActivityMapsBinding;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
@@ -66,20 +69,23 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     TextView eventName,startDate,endDate ,startTime,description,endTime,eventType,location;
     private ActivityMapsBinding binding;
     boolean ispermitted=false;
+    private List<Marker> allMarkers = new ArrayList<>();
     Location currlocation;
     String city = "Location Not found";
     FusedLocationProviderClient clientLocation;
     private final int ACCESS_FINE_CODE = 1;
     final int PERMISSION_REQUEST_CODE=1001;
     SupportMapFragment mapFragment;
-    SearchView mysearch;
+
+    EditText searchedit;
+    ImageView searchbtn;
     //Search is crashing the app
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mysearch=findViewById(R.id.searchView);
+
 
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
@@ -91,56 +97,50 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
 
         mapFragment.getMapAsync(MapsActivity.this);
+        searchedit = findViewById(R.id.searchView);
+        searchbtn =  findViewById(R.id.imageView);
 
-
-    }
-
-    private  void search_loc()
-    {
-        mysearch.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+        searchbtn.setOnClickListener(new View.OnClickListener() {
             @Override
-            public boolean onQueryTextSubmit(String query) {
-
-                String userText = mysearch.getQuery().toString();
-                List<Address> destinationList = null;
-
-                if (userText != null && !userText.isEmpty()) {
-                    Geocoder geocoder = new Geocoder(MapsActivity.this);
-                    try {
-                        destinationList = geocoder.getFromLocationName(userText, 1);
-                    } catch (IOException e) {
-                        Toast.makeText(MapsActivity.this, "Exception Occured", Toast.LENGTH_SHORT).show();
-                        e.printStackTrace();
-                    }
-
-                    if (destinationList != null && destinationList.size() > 0) {
-                        Address destinationAddress = destinationList.get(0);
-                        LatLng destinationLatLng = new LatLng(destinationAddress.getLatitude(), destinationAddress.getLongitude());
-                        mMap.addMarker(new MarkerOptions().position(destinationLatLng).title("You Are Here").icon(BitmapDescriptorFactory.fromResource(R.drawable.user)));
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(destinationLatLng, 12));
-                    } else {
-                        Toast.makeText(MapsActivity.this, "Location not found", Toast.LENGTH_SHORT).show();
-                    }
-                } else {
-                    Toast.makeText(MapsActivity.this, "Please enter a location", Toast.LENGTH_SHORT).show();
-                }
-
-                return true; // Add this line
-            }
-
-            @Override
-            public boolean onQueryTextChange(String newText) {
-                return false;
+            public void onClick(View v) {
+                // Call search_loc method when the search button is clicked
+                search_loc(searchedit, searchbtn);
             }
         });
 
+
     }
+
+    private void search_loc(EditText searchedit, ImageView btn) {
+
+                String userText = searchedit.getText().toString();
+
+                // Filter markers based on user's input
+                for (Marker marker : allMarkers) {
+                    String title = marker.getTitle();
+
+                    String snippet = marker.getSnippet();
+                    Log.d("ram","ram"+title+" ram "+snippet);
+                    if (title.contains(userText) || snippet.contains(userText)) {
+                        marker.setVisible(true);
+                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 15)); // Adjust the zoom level as needed
+
+                    } else {
+                        marker.setVisible(false);
+                    }
+                }
+    }
+
+
+
+
 
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
         getlocation();
         getOnGoingEvents();
+
 
 
         //search_loc();
@@ -206,11 +206,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     } catch (IOException e) {
                         e.printStackTrace();
                     }
-                    mMap.addMarker(new MarkerOptions()
+                    Marker marker = mMap.addMarker(new MarkerOptions()
                             .position(eventLocation)
                             .title(event.getEventType())
                             .snippet("Event Name : "+eventName+", \nDate: " + startDate+" ,End Date : " +endDate+", \nTime: " + startTime  +" ,EndTime : "+endTime+", \nDescription : "+description +", \nLocation : "+city)
                             .icon(BitmapDescriptorFactory.fromResource(which_marker))); // You can customize the marker icon as needed
+                    allMarkers.add(marker);
 
                     // Inside your method where you add markers to the map (e.g., getOnGoingEvents method)
                     mMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
