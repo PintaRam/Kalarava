@@ -455,10 +455,16 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
         try {
             Date StartDate = sdf.parse(startDate);
             Date EndDate = sdf.parse(endDate);
+            Date currentDate = new Date();
 
-            // Compare start date with end date
-            if (StartDate.compareTo(EndDate) > 0) {
-                // Start date is greater than end date
+            boolean isStartDateAfterEndDate = EndDate.after(StartDate);
+            boolean isStartDateAfterCurrentDate = StartDate.after(currentDate);
+
+            // If both conditions are correct, return true
+            if (isStartDateAfterEndDate && isStartDateAfterCurrentDate) {
+                return false;
+            } else {
+                // Otherwise, return false
                 return true;
             }
         } catch (ParseException e) {
@@ -467,7 +473,7 @@ public class OrganizeMapper extends FragmentActivity implements OnMapReadyCallba
         }
 
         // Start date is not greater than end date
-        return false;
+        return  true;
     }
 
 
