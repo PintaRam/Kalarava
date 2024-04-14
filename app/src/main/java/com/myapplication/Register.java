@@ -32,7 +32,7 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
      final String[] roles= {"Null","Admin","Guest","Organiser"};
     Button register,signIn;
     Spinner spin1;
-    String Role;
+    String Role = "";
     TextInputLayout Uname,Umail,Upassword,Uconfirmpswd,Umob;
     Spinner role;
     FirebaseDatabase fireDb;
@@ -289,7 +289,7 @@ public class Register extends AppCompatActivity implements AdapterView.OnItemSel
 
     @Override
     public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
+        Role=roles[position];
     }
 
     @Override
