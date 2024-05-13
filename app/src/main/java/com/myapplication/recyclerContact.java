@@ -30,7 +30,11 @@ public class recyclerContact extends RecyclerView.Adapter<recyclerContact.viewho
     Context context;
     ArrayList<MarkerDetails>list;
     private OnMoreInfoClickListener listener;
+    recyclerContact()
+    {
+        return;
 
+    }
     recyclerContact(Context context, ArrayList<MarkerDetails>list,OnMoreInfoClickListener listener)
     {
         this.context = context;
