@@ -1,4 +1,4 @@
-package com.myapplication;
+package com.Reva_Events;
 
 import android.app.DatePickerDialog;
 import android.app.Dialog;

@@ -1,8 +1,7 @@
-package com.myapplication;
+package com.Reva_Events;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.biometric.BiometricPrompt;
 
 import android.app.AlertDialog;
 import android.content.Context;
@@ -24,7 +23,6 @@ import  android.widget.ArrayAdapter;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.database.DataSnapshot;

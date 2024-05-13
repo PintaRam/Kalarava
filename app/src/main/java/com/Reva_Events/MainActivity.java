@@ -1,4 +1,4 @@
-package com.myapplication;
+package com.Reva_Events;
 
 import androidx.appcompat.app.AppCompatActivity;
 

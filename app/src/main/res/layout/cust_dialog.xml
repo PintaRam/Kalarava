@@ -6,7 +6,7 @@
     android:layout_height="wrap_content"
     android:id="@+id/rel"
 
-    tools:context=".MainActivity">
+    >
 
 
     <TextView

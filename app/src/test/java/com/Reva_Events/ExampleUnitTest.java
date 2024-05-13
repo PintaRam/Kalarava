@@ -1,4 +1,4 @@
-package com.myapplication;
+package com.Reva_Events;
 
 import org.junit.Test;
 

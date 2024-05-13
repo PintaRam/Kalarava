@@ -1,6 +1,4 @@
-package com.myapplication;
-
-import com.google.firebase.database.FirebaseDatabase;
+package com.Reva_Events;
 
 public class MarkerDetails {
     private String event;

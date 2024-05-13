@@ -1,4 +1,4 @@
-package com.myapplication;
+package com.Reva_Events;
 
 public class Users {
     String name,mail,paswd,cnfrpaswd,mob;

@@ -1,8 +1,6 @@
-package com.myapplication;
-import android.app.AlertDialog;
+package com.Reva_Events;
 import android.content.Context;
 import android.location.Geocoder;
-import android.util.Log;
 import android.view.LayoutInflater;
 
 import java.io.IOException;
@@ -10,19 +8,15 @@ import java.util.List;
 import java.util.Locale;
 import android.view.View;
 import android.location.Address;
-import android.location.Geocoder;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.LinearLayout;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
-import android.widget.Toast;
-import android.content.Context;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.database.FirebaseDatabase;
+import com.myapplication.R;
 
 import java.util.ArrayList;
 

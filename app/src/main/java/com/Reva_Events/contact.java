@@ -1,8 +1,4 @@
-package com.myapplication;
-
-import android.os.ParcelUuid;
-
-import com.google.firebase.database.core.view.Event;
+package com.Reva_Events;
 
 public class contact {
 
