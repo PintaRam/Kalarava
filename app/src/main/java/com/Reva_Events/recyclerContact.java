@@ -16,7 +16,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.myapplication.R;
+import com.Reva_Events.R;
 
 import java.util.ArrayList;
 

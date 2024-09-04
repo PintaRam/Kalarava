@@ -98,22 +98,22 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     private void search_loc(EditText searchedit, ImageView btn) {
 
-                String userText = searchedit.getText().toString();
+        String userText = searchedit.getText().toString();
 
-                // Filter markers based on user's input
-                for (Marker marker : allMarkers) {
-                    String title = marker.getTitle();
+        // Filter markers based on user's input
+        for (Marker marker : allMarkers) {
+            String title = marker.getTitle();
 
-                    String snippet = marker.getSnippet();
-                    Log.d("ram","ram"+title+" ram "+snippet);
-                    if (title.contains(userText) || snippet.contains(userText)) {
-                        marker.setVisible(true);
-                        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 15)); // Adjust the zoom level as needed
+            String snippet = marker.getSnippet();
+            Log.d("ram","ram"+title+" ram "+snippet);
+            if (title.contains(userText) || snippet.contains(userText)) {
+                marker.setVisible(true);
+                mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(marker.getPosition(), 15)); // Adjust the zoom level as needed
 
-                    } else {
-                        marker.setVisible(false);
-                    }
-                }
+            } else {
+                marker.setVisible(false);
+            }
+        }
     }
 
 
