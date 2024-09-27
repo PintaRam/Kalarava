@@ -59,7 +59,7 @@ Installation
 
 1. Clone the repository using Git:
    
-   git clone https://github.com/PintaRam/Reva_Events_Room.git
+   git clone https://github.com/PintaRam/Kalarava.git
    
 
 2. Open the project in Android Studio and install necessary dependencies through the Gradle build system.
