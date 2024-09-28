@@ -87,12 +87,13 @@ KALARAVA is licensed under the Apache License 2.0, a permissive opensource licen
 Contributors
 
 KALARAVA was developed by the following individuals from Reva University:
+NarendraBabu C.R(narendrababu.cr@gmail.com)
  Pintaram M (pintu.borana20@gmail.com)
  Spoorthi M S (spoorthi.2jul@gmail.com)
  Vidhya Ganesh A (vidhyaganesh625@gmail.com)
  Vignesh P (vikki.vishnu04@gmail.com)
 
-For support or inquiries, please contact Narendra Babu at narendrababu.cr@gmail.com.
+For support or inquiries, please contact Narendra Babu C R at narendrababu.cr@gmail.com.
 
 Conclusion
 
